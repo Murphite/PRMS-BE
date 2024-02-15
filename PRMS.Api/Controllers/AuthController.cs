@@ -6,7 +6,7 @@ using PRMS.Core.Dtos;
 namespace PRMS.Api.Controllers;
 
 [ApiController]
-[Route("auth")]
+[Route("api/v1/auth")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;

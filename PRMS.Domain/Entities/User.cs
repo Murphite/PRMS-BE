@@ -6,6 +6,7 @@ public class User : IdentityUser, IAuditable
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
+    public string PhoneNumber { get; set; }
     public string? ImageUrl { get; set; }
     public string? ImagePublicId { get; set; }
     public string? AddressId { get; set; }
@@ -14,16 +15,4 @@ public class User : IdentityUser, IAuditable
     
     public Address? Address { get; set; }
 
-    public static User Create(string firstName, string lastName, string email)
-    {
-        return new User
-        {
-            FirstName = firstName,
-            LastName = lastName,
-            Email = email,
-            UserName = email,
-            CreatedAt = DateTimeOffset.UtcNow,
-            UpdatedAt = DateTimeOffset.UtcNow
-        };
-    }
 }

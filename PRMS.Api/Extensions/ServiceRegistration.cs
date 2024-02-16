@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PRMS.Core;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Services;
 using PRMS.Infrastructure;

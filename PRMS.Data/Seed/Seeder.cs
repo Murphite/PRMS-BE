@@ -29,7 +29,13 @@ public static class Seeder
 
             var userManager = app.ApplicationServices.CreateScope().ServiceProvider
                 .GetRequiredService<UserManager<User>>();
-            var user = User.Create("Admin", "Admin", "admin@admin.com");
+            var user = new User
+            {
+                FirstName = "Admin",
+                LastName = "Admin",
+                Email = "admin@admin.com",
+                PhoneNumber = "080123456789"
+            };
 
             await userManager.CreateAsync(user, "Admin@123");
             await userManager.AddToRoleAsync(user, RolesConstant.Admin);

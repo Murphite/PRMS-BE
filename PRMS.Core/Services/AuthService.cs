@@ -19,17 +19,23 @@ public class AuthService : IAuthService
 
     public async Task<Result> Register(RegisterUserDto registerUserDto)
     {
-        var user = User.Create(registerUserDto.FirstName, registerUserDto.LastName, registerUserDto.Email);
-        
+        var user = new User
+        {
+            FirstName = registerUserDto.FirstName,
+            LastName = registerUserDto.LastName,
+            Email = registerUserDto.Email,
+            PhoneNumber = registerUserDto.PhoneNumber,
+        };
+
         var result = await _userManager.CreateAsync(user, registerUserDto.Password);
 
         if (!result.Succeeded)
             return result.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();
-        
+
         result = await _userManager.AddToRoleAsync(user, RolesConstant.User);
         if (!result.Succeeded)
             return result.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();
-        
+
         return Result.Success();
     }
 

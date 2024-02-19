@@ -10,7 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbServices(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
-builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 var app = builder.Build();
 

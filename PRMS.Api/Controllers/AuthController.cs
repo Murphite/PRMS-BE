@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
+using System.Data;
 
 namespace PRMS.Api.Controllers;
 
@@ -17,6 +19,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
+    [Authorize(Roles="regular")]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto registerUserDto)
     {
         var result = await _authService.Register(registerUserDto);

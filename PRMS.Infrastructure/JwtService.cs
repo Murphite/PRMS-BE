@@ -17,7 +17,7 @@ public class JwtService : IJwtService
         _config = config;
     }
 
-    public string GenerateToken(User user, List<string> roles)
+    public string GenerateToken(User user, IList<string> roles)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -30,8 +30,8 @@ public class JwtService : IJwtService
             new(JwtRegisteredClaimNames.Name, $"{user.FirstName} {user.LastName}"),
             new(JwtRegisteredClaimNames.Email, user.Email!)
         };
-        roles.ForEach(x => claimList.Add(new Claim(ClaimTypes.Role, x)));
-        
+        claimList.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

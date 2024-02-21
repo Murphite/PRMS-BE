@@ -4,5 +4,5 @@ namespace PRMS.Core.Abstractions;
 
 public interface IJwtService
 {
-    public string GenerateToken(User user);
+    public string GenerateToken(User user, List<string> roles);
 }

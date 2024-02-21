@@ -37,4 +37,20 @@ public class AuthController : ControllerBase
 
         return Ok(ResponseDto<object>.Success(result.Data));
     }
+
+    [HttpPost]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest("Invalid credentials.");
+        }
+
+        var resetPasswordResult = await _authService.ResetPasswordAsync(resetPasswordDto);
+
+        if (resetPasswordResult.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(resetPasswordResult.Errors));
+
+        return Ok(ResponseDto<object>.Success(resetPasswordResult));
+    }
 }

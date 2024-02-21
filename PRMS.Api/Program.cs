@@ -2,7 +2,6 @@ using PRMS.Api.Extensions;
 using PRMS.Api.Middlewares;
 using PRMS.Core.Abstractions;
 using PRMS.Data.Seed;
-using RYT.Services.Emailing;
 
 var builder = WebApplication.CreateBuilder(args);
 

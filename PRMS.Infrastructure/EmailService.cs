@@ -3,8 +3,8 @@ using Microsoft.Extensions.Configuration;
 using MimeKit;
 using PRMS.Core.Abstractions;
 
-namespace RYT.Services.Emailing
-{
+namespace PRMS.Infrastructure.EmailService;
+
     public class EmailService : IEmailService
     {
         private readonly IConfiguration _config;
@@ -40,4 +40,4 @@ namespace RYT.Services.Emailing
             return true;
         }
     }
-}
+

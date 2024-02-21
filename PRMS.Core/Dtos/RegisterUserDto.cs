@@ -11,4 +11,5 @@ public class RegisterUserDto
     [Required] [EmailAddress] public string Email { get; init; }
 
     [Required] public string Password { get; init; }
+    [Required] public string ConfirmPassword { get; init; }
 }

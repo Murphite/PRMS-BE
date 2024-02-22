@@ -19,7 +19,6 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register/regular")]
-    [Authorize(Roles="regular")]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto registerUserDto)
     {
         var result = await _authService.Register(registerUserDto);

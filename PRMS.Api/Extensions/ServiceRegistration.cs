@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Services;
 using PRMS.Infrastructure;
+using PRMS.Infrastructure.EmailService;
 using PRMS.Infrastructure.Repositories;
 
 namespace PRMS.Api.Extensions;
@@ -62,5 +63,6 @@ public static class ServiceRegistration
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IRepository, Repository>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IEmailService, EmailService>();
     }
 }

@@ -1,5 +1,6 @@
 using PRMS.Api.Extensions;
 using PRMS.Api.Middlewares;
+using PRMS.Core.Abstractions;
 using PRMS.Data.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbServices(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
+
 
 var app = builder.Build();
 

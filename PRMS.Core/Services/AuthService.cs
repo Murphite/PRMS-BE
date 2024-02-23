@@ -10,10 +10,12 @@ public class AuthService : IAuthService
 {
     private readonly IJwtService _jwtService;
     private readonly UserManager<User> _userManager;
+    private readonly IRepository _repository;
 
-    public AuthService(UserManager<User> userManager, IJwtService jwtService)
+    public AuthService(UserManager<User> userManager, IRepository repository, IJwtService jwtService)
     {
         _userManager = userManager;
+        _repository = repository;
         _jwtService = jwtService;
     }
 
@@ -51,7 +53,8 @@ public class AuthService : IAuthService
         if (!isValidUser)
             return new Error[] { new("Auth.Error", "email or password not correct") };
 
-        var token = _jwtService.GenerateToken(user);
+        var roles = await _userManager.GetRolesAsync(user);
+        var token = _jwtService.GenerateToken(user, roles);
 
         return new LoginResponseDto(token);
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
+using PRMS.Api.Extensions;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 
@@ -43,7 +44,7 @@ public class AuthController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest("Invalid credentials.");
+            return BadRequest(ResponseDto<object>.Failure(ModelState.GetErrors()));
         }
 
         var resetPasswordResult = await _authService.ResetPasswordAsync(resetPasswordDto);

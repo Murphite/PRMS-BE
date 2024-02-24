@@ -23,5 +23,14 @@
         <ProjectReference Include="..\PRMS.Core\PRMS.Core.csproj" />
         <ProjectReference Include="..\PRMS.Infrastructure\PRMS.Infrastructure.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <None Remove="wwwroot\**" />
+        <EmbeddedResource Include="wwwroot\**" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="wwwroot\assets\vectors\" />
+    </ItemGroup>
 
 </Project>

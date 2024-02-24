@@ -12,7 +12,7 @@ using PRMS.Data.Contexts;
 namespace PRMS.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240224170319_Initial")]
+    [Migration("20240224195901_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -430,6 +430,15 @@ namespace PRMS.Data.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("MedicalCenterId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PrimaryPhysicanEmail")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PrimaryPhysicanName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PrimaryPhysicanPhoneNo")
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")

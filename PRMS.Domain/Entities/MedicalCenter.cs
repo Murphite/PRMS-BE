@@ -13,7 +13,7 @@ public class MedicalCenter : Entity, IAuditable
     public DateTimeOffset UpdatedAt { get; }
     
     public Address Address { get; set; }
-    public ICollection<Patient> Patients{ get; set; }
+    public ICollection<Patient> Patients { get; set; }
     public ICollection<Physician> Physicians { get; set; }
     public ICollection<MedicalCenterReview> Reviews { get; set; }
     public ICollection<CategoryMedicalCenterPivot> CategoryPivot { get; set; }

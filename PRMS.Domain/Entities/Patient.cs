@@ -8,6 +8,9 @@ public class Patient: Entity, IAuditable
     public DateOnly DateOfBirth { get; set; }
     public Gender Gender { get; set; }
     public BloodGroup BloodGroup { get; set; }
+    public string? PrimaryPhysicanName { get; set; }
+    public string? PrimaryPhysicanEmail { get; set; }
+    public string? PrimaryPhysicanPhoneNo { get; set; }
     public float Height { get; set; }
     public float Weight { get; set; }
     public DateTimeOffset CreatedAt { get; }

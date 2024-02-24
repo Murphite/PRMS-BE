@@ -258,6 +258,9 @@ namespace PRMS.Data.Migrations
                     DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false),
                     Gender = table.Column<int>(type: "integer", nullable: false),
                     BloodGroup = table.Column<int>(type: "integer", nullable: false),
+                    PrimaryPhysicanName = table.Column<string>(type: "text", nullable: true),
+                    PrimaryPhysicanEmail = table.Column<string>(type: "text", nullable: true),
+                    PrimaryPhysicanPhoneNo = table.Column<string>(type: "text", nullable: true),
                     Height = table.Column<float>(type: "real", nullable: false),
                     Weight = table.Column<float>(type: "real", nullable: false),
                     MedicalCenterId = table.Column<string>(type: "text", nullable: true)

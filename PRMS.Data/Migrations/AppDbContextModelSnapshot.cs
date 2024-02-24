@@ -429,6 +429,15 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("MedicalCenterId")
                         .HasColumnType("text");
 
+                    b.Property<string>("PrimaryPhysicanEmail")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PrimaryPhysicanName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PrimaryPhysicanPhoneNo")
+                        .HasColumnType("text");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");

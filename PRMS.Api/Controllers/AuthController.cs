@@ -39,7 +39,7 @@ public class AuthController : ControllerBase
         return Ok(ResponseDto<object>.Success(result.Data));
     }
 
-    [HttpPost("Reset-Password")]
+    [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
     {
         if (!ModelState.IsValid)

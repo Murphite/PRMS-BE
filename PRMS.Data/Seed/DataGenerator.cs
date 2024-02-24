@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Bogus;
+﻿using Bogus;
 using Microsoft.AspNetCore.Identity;
 using PRMS.Data.Contexts;
 using PRMS.Domain.Constants;
@@ -60,7 +59,7 @@ public class DataGenerator
             .RuleFor(a => a.Street, f => f.Address.StreetAddress())
             .RuleFor(a => a.City, f => f.Address.City())
             .RuleFor(a => a.State, f => f.Address.State())
-            .RuleFor(c => c.Country, f => "Nigeria")
+            .RuleFor(c => c.Country, "Nigeria")
             .RuleFor(c => c.Latitude, f => f.Address.Latitude())
             .RuleFor(c => c.Longitude, f => f.Address.Longitude());
 
@@ -110,7 +109,7 @@ public class DataGenerator
             var patient = new Faker<Patient>()
                 .RuleFor(p => p.UserId, user.Id)
                 .RuleFor(p => p.DateOfBirth, f => f.Date.PastDateOnly(25))
-                .RuleFor(p => p.Gender, f => f.PickRandom(new[] { Gender.Female, Gender.Male }))
+                .RuleFor(p => p.Gender, f => f.PickRandom(Gender.Female, Gender.Male))
                 .RuleFor(p => p.BloodGroup, f => f.PickRandom<BloodGroup>())
                 .RuleFor(p => p.Height, f => f.Random.Float(150, 200))
                 .RuleFor(p => p.Weight, f => f.Random.Float(50, 200))
@@ -171,11 +170,7 @@ public class DataGenerator
                 .RuleFor(p => p.MedicalCenterId, medicalCenter.Id)
                 .RuleFor(p => p.Title, f => f.PickRandom(new[] { "Dr", "Nurse", "Pharm" }))
                 .RuleFor(p => p.Speciality,
-                    f => f.PickRandom(new[]
-                    {
-                        "Cardiologist", "Dentist", "Neurologist", "Surgeon", "Gynecologist", "Pediatrics",
-                        "Orthoopedic Surgeon", "Psychiatrist"
-                    }))
+                    f => f.PickRandom("Cardiologist", "Dentist", "Neurologist", "Surgeon", "Gynecologist", "Pediatrics", "Orthoopedic Surgeon", "Psychiatrist"))
                 .RuleFor(p => p.About, f => f.Lorem.Paragraphs(3))
                 .RuleFor(p => p.WorkingTime, "Monday-Friday, 8am-6pm")
                 .RuleFor(p => p.YearsOfExperience, f => f.Random.Int(2, 30))

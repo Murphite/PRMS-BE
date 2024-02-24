@@ -84,7 +84,7 @@ public class AuthService : IAuthService
 
         if (!confirmEmailResult.Succeeded)
         {
-            return Result.Failure(confirmEmailResult.Errors.Select(e => new Error(e.Code, e.Description)));
+            return Result.Failure(confirmEmailResult.Errors.Select(e => new Error(e.Code, e.Description)).ToArray());
         }
 
         user.EmailConfirmed = true;
@@ -93,7 +93,7 @@ public class AuthService : IAuthService
 
         if (!updateResult.Succeeded)
         {
-            return Result.Failure(updateResult.Errors.Select(e => new Error(e.Code, e.Description)));
+            return Result.Failure(updateResult.Errors.Select(e => new Error(e.Code, e.Description)).ToArray());
         }
 
         return Result.Success();

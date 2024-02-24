@@ -72,4 +72,30 @@ public class AuthService : IAuthService
 
         return Result.Success();
     }
+
+    public async Task<Result> ConfirmEmail(string email, string token)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user is null)
+            return new Error[] { new("Auth.Error", "User not found") };
+
+        var confirmEmailResult = await _userManager.ConfirmEmailAsync(user, token);
+
+        if (!confirmEmailResult.Succeeded)
+        {
+            return Result.Failure(confirmEmailResult.Errors.Select(e => new Error(e.Code, e.Description)));
+        }
+
+        user.EmailConfirmed = true;
+
+        var updateResult = await _userManager.UpdateAsync(user);
+
+        if (!updateResult.Succeeded)
+        {
+            return Result.Failure(updateResult.Errors.Select(e => new Error(e.Code, e.Description)));
+        }
+
+        return Result.Success();
+    }
 }

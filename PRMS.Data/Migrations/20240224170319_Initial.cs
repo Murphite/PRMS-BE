@@ -250,30 +250,6 @@ namespace PRMS.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MedicalCenterMedicalCenterCategory",
-                columns: table => new
-                {
-                    CategoriesId = table.Column<string>(type: "text", nullable: false),
-                    MedicalCentersId = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MedicalCenterMedicalCenterCategory", x => new { x.CategoriesId, x.MedicalCentersId });
-                    table.ForeignKey(
-                        name: "FK_MedicalCenterMedicalCenterCategory_MedicalCenterCategories_~",
-                        column: x => x.CategoriesId,
-                        principalTable: "MedicalCenterCategories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MedicalCenterMedicalCenterCategory_MedicalCenters_MedicalCe~",
-                        column: x => x.MedicalCentersId,
-                        principalTable: "MedicalCenters",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Patients",
                 columns: table => new
                 {
@@ -580,11 +556,6 @@ namespace PRMS.Data.Migrations
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MedicalCenterMedicalCenterCategory_MedicalCentersId",
-                table: "MedicalCenterMedicalCenterCategory",
-                column: "MedicalCentersId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_MedicalCenterReviews_MedicalCenterId",
                 table: "MedicalCenterReviews",
                 column: "MedicalCenterId");
@@ -681,9 +652,6 @@ namespace PRMS.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Favorites");
-
-            migrationBuilder.DropTable(
-                name: "MedicalCenterMedicalCenterCategory");
 
             migrationBuilder.DropTable(
                 name: "MedicalCenterReviews");

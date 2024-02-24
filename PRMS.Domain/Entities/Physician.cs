@@ -8,8 +8,6 @@ public class Physician : Entity, IAuditable
     public string MedicalCenterId { get; set; }
     public string About { get; set; }
     public string WorkingTime { get; set; }
-    public string? ImageUrl { get; set; }
-    public string? PublicId { get; set; }
     public int YearsOfExperience { get; set; }
     
     public DateTimeOffset CreatedAt { get; }

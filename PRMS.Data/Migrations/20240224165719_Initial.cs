@@ -21,8 +21,8 @@ namespace PRMS.Data.Migrations
                     City = table.Column<string>(type: "text", nullable: false),
                     State = table.Column<string>(type: "text", nullable: false),
                     Country = table.Column<string>(type: "text", nullable: false),
-                    Longitude = table.Column<decimal>(type: "numeric", nullable: true),
-                    Latitude = table.Column<decimal>(type: "numeric", nullable: true),
+                    Longitude = table.Column<double>(type: "double precision", nullable: true),
+                    Latitude = table.Column<double>(type: "double precision", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
@@ -68,7 +68,7 @@ namespace PRMS.Data.Migrations
                     LastName = table.Column<string>(type: "text", nullable: false),
                     PhoneNumber = table.Column<string>(type: "text", nullable: false),
                     ImageUrl = table.Column<string>(type: "text", nullable: true),
-                    ImagePublicId = table.Column<string>(type: "text", nullable: true),
+                    PublicId = table.Column<string>(type: "text", nullable: true),
                     AddressId = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -103,7 +103,9 @@ namespace PRMS.Data.Migrations
                     Id = table.Column<string>(type: "text", nullable: false),
                     Type = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    AddressId = table.Column<string>(type: "text", nullable: false)
+                    AddressId = table.Column<string>(type: "text", nullable: false),
+                    ImageUrl = table.Column<string>(type: "text", nullable: true),
+                    PublicId = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -223,6 +225,31 @@ namespace PRMS.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CategoryMedicalCenters",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    MedicalCenterCategoryId = table.Column<string>(type: "text", nullable: false),
+                    MedicalCenterId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoryMedicalCenters", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CategoryMedicalCenters_MedicalCenterCategories_MedicalCente~",
+                        column: x => x.MedicalCenterCategoryId,
+                        principalTable: "MedicalCenterCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CategoryMedicalCenters_MedicalCenters_MedicalCenterId",
+                        column: x => x.MedicalCenterId,
+                        principalTable: "MedicalCenters",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MedicalCenterMedicalCenterCategory",
                 columns: table => new
                 {
@@ -252,13 +279,11 @@ namespace PRMS.Data.Migrations
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: false),
-                    ImageUrl = table.Column<string>(type: "text", nullable: true),
-                    PublicId = table.Column<string>(type: "text", nullable: true),
                     DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false),
                     Gender = table.Column<int>(type: "integer", nullable: false),
                     BloodGroup = table.Column<int>(type: "integer", nullable: false),
-                    Height = table.Column<decimal>(type: "numeric", nullable: false),
-                    Weight = table.Column<decimal>(type: "numeric", nullable: false),
+                    Height = table.Column<float>(type: "real", nullable: false),
+                    Weight = table.Column<float>(type: "real", nullable: false),
                     MedicalCenterId = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -288,8 +313,6 @@ namespace PRMS.Data.Migrations
                     MedicalCenterId = table.Column<string>(type: "text", nullable: false),
                     About = table.Column<string>(type: "text", nullable: false),
                     WorkingTime = table.Column<string>(type: "text", nullable: false),
-                    ImageUrl = table.Column<string>(type: "text", nullable: true),
-                    PublicId = table.Column<string>(type: "text", nullable: true),
                     YearsOfExperience = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -439,7 +462,9 @@ namespace PRMS.Data.Migrations
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     PatientId = table.Column<string>(type: "text", nullable: false),
-                    PhysicianId = table.Column<string>(type: "text", nullable: false)
+                    PhysicianId = table.Column<string>(type: "text", nullable: false),
+                    Diagnosis = table.Column<string>(type: "text", nullable: false),
+                    Note = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -464,12 +489,12 @@ namespace PRMS.Data.Migrations
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     PatientId = table.Column<string>(type: "text", nullable: false),
+                    PrescriptionId = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Dosage = table.Column<string>(type: "text", nullable: false),
                     Frequency = table.Column<string>(type: "text", nullable: false),
                     Duration = table.Column<string>(type: "text", nullable: false),
-                    Instruction = table.Column<string>(type: "text", nullable: true),
-                    PrescriptionId = table.Column<string>(type: "text", nullable: true)
+                    Instruction = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -538,6 +563,16 @@ namespace PRMS.Data.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoryMedicalCenters_MedicalCenterCategoryId",
+                table: "CategoryMedicalCenters",
+                column: "MedicalCenterCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoryMedicalCenters_MedicalCenterId",
+                table: "CategoryMedicalCenters",
+                column: "MedicalCenterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Favorites_PatientId",
@@ -640,6 +675,9 @@ namespace PRMS.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "CategoryMedicalCenters");
 
             migrationBuilder.DropTable(
                 name: "Favorites");

@@ -185,11 +185,11 @@ namespace PRMS.Data.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal?>("Latitude")
-                        .HasColumnType("numeric");
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision");
 
-                    b.Property<decimal?>("Longitude")
-                        .HasColumnType("numeric");
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("State")
                         .IsRequired()
@@ -238,6 +238,28 @@ namespace PRMS.Data.Migrations
                     b.ToTable("Appointments");
                 });
 
+            modelBuilder.Entity("PRMS.Domain.Entities.CategoryMedicalCenterPivot", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MedicalCenterCategoryId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MedicalCenterId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicalCenterCategoryId");
+
+                    b.HasIndex("MedicalCenterId");
+
+                    b.ToTable("CategoryMedicalCenters");
+                });
+
             modelBuilder.Entity("PRMS.Domain.Entities.Favorite", b =>
                 {
                     b.Property<string>("Id")
@@ -270,8 +292,14 @@ namespace PRMS.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PublicId")
                         .HasColumnType("text");
 
                     b.Property<int>("Type")
@@ -410,24 +438,18 @@ namespace PRMS.Data.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("Height")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("text");
+                    b.Property<float>("Height")
+                        .HasColumnType("real");
 
                     b.Property<string>("MedicalCenterId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PublicId")
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Weight")
-                        .HasColumnType("numeric");
+                    b.Property<float>("Weight")
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -447,14 +469,8 @@ namespace PRMS.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("text");
-
                     b.Property<string>("MedicalCenterId")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PublicId")
                         .HasColumnType("text");
 
                     b.Property<string>("Speciality")
@@ -521,6 +537,13 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<string>("Diagnosis")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
                     b.Property<string>("PatientId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -567,9 +590,6 @@ namespace PRMS.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ImagePublicId")
-                        .HasColumnType("text");
-
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
@@ -603,6 +623,9 @@ namespace PRMS.Data.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("PublicId")
+                        .HasColumnType("text");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
@@ -716,6 +739,25 @@ namespace PRMS.Data.Migrations
                     b.Navigation("Physician");
                 });
 
+            modelBuilder.Entity("PRMS.Domain.Entities.CategoryMedicalCenterPivot", b =>
+                {
+                    b.HasOne("PRMS.Domain.Entities.MedicalCenterCategory", "MedicalCenterCategory")
+                        .WithMany()
+                        .HasForeignKey("MedicalCenterCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PRMS.Domain.Entities.MedicalCenter", "MedicalCenter")
+                        .WithMany()
+                        .HasForeignKey("MedicalCenterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MedicalCenter");
+
+                    b.Navigation("MedicalCenterCategory");
+                });
+
             modelBuilder.Entity("PRMS.Domain.Entities.Favorite", b =>
                 {
                     b.HasOne("PRMS.Domain.Entities.Patient", "Patient")
@@ -774,11 +816,13 @@ namespace PRMS.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PRMS.Domain.Entities.Prescription", null)
+                    b.HasOne("PRMS.Domain.Entities.Prescription", "Prescription")
                         .WithMany("Medications")
                         .HasForeignKey("PrescriptionId");
 
                     b.Navigation("Patient");
+
+                    b.Navigation("Prescription");
                 });
 
             modelBuilder.Entity("PRMS.Domain.Entities.Patient", b =>

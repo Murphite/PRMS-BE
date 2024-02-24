@@ -10,6 +10,7 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<MedicalCenter> MedicalCenters { get; set; }
     public DbSet<MedicalCenterCategory> MedicalCenterCategories { get; set; }
     public DbSet<MedicalCenterReview> MedicalCenterReviews { get; set; }
+    public DbSet<CategoryMedicalCenterPivot> CategoryMedicalCenters { get; set; }
     public DbSet<Patient> Patients { get; set; }
     public DbSet<Physician> Physicians { get; set; }
     public DbSet<PhysicianReview> PhysicianReviews { get; set; }

@@ -7,6 +7,8 @@ public class MedicalCenter : Entity, IAuditable
     public MedicalCenterType Type { get; set; }
     public string Name { get; set; }
     public string AddressId { get; set; }
+    public string? ImageUrl { get; set; }
+    public string? PublicId { get; set; }
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset UpdatedAt { get; }
     

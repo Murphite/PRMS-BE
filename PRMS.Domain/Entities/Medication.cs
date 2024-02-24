@@ -3,6 +3,7 @@
 public class Medication : Entity, IAuditable
 {
     public string PatientId { get; set; }
+    public string? PrescriptionId { get; set; }
     public string Name { get; set; }
     public string Dosage { get; set; }
     public string Frequency { get; set; }
@@ -10,6 +11,7 @@ public class Medication : Entity, IAuditable
     public string? Instruction { get; set; }
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset UpdatedAt { get; }
-    
+
     public Patient Patient { get; set; }
+    public Prescription? Prescription { get; set; }
 }

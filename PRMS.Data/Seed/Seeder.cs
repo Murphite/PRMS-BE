@@ -34,11 +34,15 @@ public static class Seeder
                 FirstName = "Admin",
                 LastName = "Admin",
                 Email = "admin@admin.com",
+                UserName = "admin@admin.com",
                 PhoneNumber = "080123456789"
             };
 
             await userManager.CreateAsync(user, "Admin@123");
             await userManager.AddToRoleAsync(user, RolesConstant.Admin);
+            
+            var dataGenerator = new DataGenerator(context, userManager);
+            await dataGenerator.Run();
         }
     }
 }

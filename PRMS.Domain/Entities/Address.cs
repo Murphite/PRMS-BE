@@ -7,8 +7,8 @@ public class Address : Entity, IAuditable
     public string State { get; set; }
     public string Country { get; set; }
     
-    public decimal? Longitude { get; set; }
-    public decimal? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public double? Latitude { get; set; }
     
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }

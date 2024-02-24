@@ -5,13 +5,11 @@ namespace PRMS.Domain.Entities;
 public class Patient: Entity, IAuditable
 {
     public string UserId { get; set; }
-    public string? ImageUrl { get; set; }
-    public string? PublicId { get; set; }
     public DateOnly DateOfBirth { get; set; }
     public Gender Gender { get; set; }
     public BloodGroup BloodGroup { get; set; }
-    public decimal Height { get; set; }
-    public decimal Weight { get; set; }
+    public float Height { get; set; }
+    public float Weight { get; set; }
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset UpdatedAt { get; }
     

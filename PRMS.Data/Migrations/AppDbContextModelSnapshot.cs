@@ -217,7 +217,7 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("AddressId")
                         .HasColumnType("text");
 
-                    b.Property<string>("ClinicId")
+                    b.Property<string>("MedicalCenterId")
                         .HasColumnType("text");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -288,7 +288,7 @@ namespace PRMS.Data.Migrations
 
                     b.HasIndex("AddressId");
 
-                    b.HasIndex("ClinicId");
+                    b.HasIndex("MedicalCenterId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -370,7 +370,7 @@ namespace PRMS.Data.Migrations
 
                     b.HasOne("PRMS.Domain.Entities.Clinic", null)
                         .WithMany("Users")
-                        .HasForeignKey("ClinicId");
+                        .HasForeignKey("MedicalCenterId");
 
                     b.Navigation("Address");
                 });

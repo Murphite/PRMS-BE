@@ -95,7 +95,7 @@ namespace PRMS.Data.Migrations
                     AddressId = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    ClinicId = table.Column<string>(type: "text", nullable: true),
+                    MedicalCenterId = table.Column<string>(type: "text", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -120,8 +120,8 @@ namespace PRMS.Data.Migrations
                         principalTable: "Addresses",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Clinics_ClinicId",
-                        column: x => x.ClinicId,
+                        name: "FK_AspNetUsers_Clinics_MedicalCenterId",
+                        column: x => x.MedicalCenterId,
                         principalTable: "Clinics",
                         principalColumn: "Id");
                 });
@@ -248,9 +248,9 @@ namespace PRMS.Data.Migrations
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_ClinicId",
+                name: "IX_AspNetUsers_MedicalCenterId",
                 table: "AspNetUsers",
-                column: "ClinicId");
+                column: "MedicalCenterId");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",

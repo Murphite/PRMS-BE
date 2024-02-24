@@ -5,6 +5,7 @@ namespace PRMS.Domain.Entities;
 public class User : IdentityUser, IAuditable
 {
     public string FirstName { get; set; }
+    public string? MiddleName { get; set; }
     public string LastName { get; set; }
     public string PhoneNumber { get; set; }
     public string? ImageUrl { get; set; }
@@ -14,5 +15,4 @@ public class User : IdentityUser, IAuditable
     public DateTimeOffset UpdatedAt { get; set; }
     
     public Address? Address { get; set; }
-
 }

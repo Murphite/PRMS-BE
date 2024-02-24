@@ -6,6 +6,10 @@ public class Address : Entity, IAuditable
     public string City { get; set; }
     public string State { get; set; }
     public string Country { get; set; }
+    
+    public decimal? Longitude { get; set; }
+    public decimal? Latitude { get; set; }
+    
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 }

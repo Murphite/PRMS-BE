@@ -4,6 +4,7 @@ using PRMS.Core.Dtos;
 using PRMS.Domain.Constants;
 using PRMS.Domain.Entities;
 
+
 namespace PRMS.Core.Services;
 
 public class AuthService : IAuthService
@@ -11,12 +12,14 @@ public class AuthService : IAuthService
     private readonly IJwtService _jwtService;
     private readonly UserManager<User> _userManager;
     private readonly IRepository _repository;
+    private readonly IEmailService _emailService;
 
-    public AuthService(UserManager<User> userManager, IRepository repository, IJwtService jwtService)
+    public AuthService(UserManager<User> userManager, IRepository repository, IJwtService jwtService, IEmailService emailService)
     {
         _userManager = userManager;
         _repository = repository;
         _jwtService = jwtService;
+        _emailService = emailService;
     }
 
     public async Task<Result> Register(RegisterUserDto registerUserDto)
@@ -72,4 +75,23 @@ public class AuthService : IAuthService
 
         return Result.Success();
     }
+
+    public async Task<Result> ForgotPassword(ResetPasswordDto resetPasswordDto)
+    {
+        var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+
+        if (user == null)
+            return new Error[] { new Error("Auth.Error", "No user found with the provided email") };
+
+        var resetLink = ResetPasswordAsync(resetPasswordDto);
+
+        var emailSubject = "Your New Password";
+
+        var emailBody = $"Hello {user.FirstName}, click this link to reset your password: {resetLink}.";
+
+        var emailForgotPassword = await _emailService.SendEmailAsync(resetPasswordDto.Email, emailSubject, emailBody);
+        
+        return Result.Success();
+    }
+
 }

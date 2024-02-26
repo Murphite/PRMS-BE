@@ -54,4 +54,15 @@ public class AuthController : ControllerBase
 
         return Ok(ResponseDto<object>.Success(resetPasswordResult));
     }
+
+    [HttpPost("ForgotPassword")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ResetPasswordDto resetPasswordDto)
+    {
+        var result = await _authService.ForgotPassword(resetPasswordDto);
+
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success());
+    }
 }

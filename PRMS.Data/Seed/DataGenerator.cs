@@ -111,6 +111,13 @@ public class DataGenerator
                 .RuleFor(p => p.DateOfBirth, f => f.Date.PastDateOnly(25))
                 .RuleFor(p => p.Gender, f => f.PickRandom(Gender.Female, Gender.Male))
                 .RuleFor(p => p.BloodGroup, f => f.PickRandom<BloodGroup>())
+                .RuleFor(p => p.PrimaryPhysicanName, f => f.Person.FullName)
+                .RuleFor(p => p.PrimaryPhysicanEmail, f => f.Person.Email)
+                .RuleFor(p => p.PrimaryPhysicanPhoneNo, f => f.Person.Phone)
+                .RuleFor(p => p.EmergencyContactName, f => f.Person.FullName)
+                .RuleFor(p => p.EmergencyContactRelationship,
+                    f => f.PickRandom("Father", "Mother", "Sibling", "Spouse", "Friend"))
+                .RuleFor(p => p.EmergencyContactPhoneNo, f => f.Person.Phone)
                 .RuleFor(p => p.Height, f => f.Random.Float(150, 200))
                 .RuleFor(p => p.Weight, f => f.Random.Float(50, 200))
                 .Generate();
@@ -120,7 +127,7 @@ public class DataGenerator
                 .RuleFor(d => d.MedicalDetailsType, MedicalDetailsType.Allergy)
                 .RuleFor(d => d.Value, f => f.Lorem.Sentence(2))
                 .Generate();
-            
+
             var detail2 = new Faker<MedicalDetail>()
                 .RuleFor(d => d.PatientId, patient.Id)
                 .RuleFor(d => d.MedicalDetailsType, MedicalDetailsType.MedicalCondition)
@@ -170,7 +177,8 @@ public class DataGenerator
                 .RuleFor(p => p.MedicalCenterId, medicalCenter.Id)
                 .RuleFor(p => p.Title, f => f.PickRandom(new[] { "Dr", "Nurse", "Pharm" }))
                 .RuleFor(p => p.Speciality,
-                    f => f.PickRandom("Cardiologist", "Dentist", "Neurologist", "Surgeon", "Gynecologist", "Pediatrics", "Orthoopedic Surgeon", "Psychiatrist"))
+                    f => f.PickRandom("Cardiologist", "Dentist", "Neurologist", "Surgeon", "Gynecologist", "Pediatrics",
+                        "Orthoopedic Surgeon", "Psychiatrist"))
                 .RuleFor(p => p.About, f => f.Lorem.Paragraphs(3))
                 .RuleFor(p => p.WorkingTime, "Monday-Friday, 8am-6pm")
                 .RuleFor(p => p.YearsOfExperience, f => f.Random.Int(2, 30))

@@ -225,25 +225,24 @@ namespace PRMS.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CategoryMedicalCenters",
+                name: "MedicalCenterCategoryPivot",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
-                    MedicalCenterCategoryId = table.Column<string>(type: "text", nullable: false),
-                    MedicalCenterId = table.Column<string>(type: "text", nullable: false)
+                    MedicalCenterCategoriesId = table.Column<string>(type: "text", nullable: false),
+                    MedicalCentersId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CategoryMedicalCenters", x => x.Id);
+                    table.PrimaryKey("PK_MedicalCenterCategoryPivot", x => new { x.MedicalCenterCategoriesId, x.MedicalCentersId });
                     table.ForeignKey(
-                        name: "FK_CategoryMedicalCenters_MedicalCenterCategories_MedicalCente~",
-                        column: x => x.MedicalCenterCategoryId,
+                        name: "FK_MedicalCenterCategoryPivot_MedicalCenterCategories_MedicalC~",
+                        column: x => x.MedicalCenterCategoriesId,
                         principalTable: "MedicalCenterCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CategoryMedicalCenters_MedicalCenters_MedicalCenterId",
-                        column: x => x.MedicalCenterId,
+                        name: "FK_MedicalCenterCategoryPivot_MedicalCenters_MedicalCentersId",
+                        column: x => x.MedicalCentersId,
                         principalTable: "MedicalCenters",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -261,6 +260,9 @@ namespace PRMS.Data.Migrations
                     PrimaryPhysicanName = table.Column<string>(type: "text", nullable: true),
                     PrimaryPhysicanEmail = table.Column<string>(type: "text", nullable: true),
                     PrimaryPhysicanPhoneNo = table.Column<string>(type: "text", nullable: true),
+                    EmergencyContactName = table.Column<string>(type: "text", nullable: false),
+                    EmergencyContactRelationship = table.Column<string>(type: "text", nullable: false),
+                    EmergencyContactPhoneNo = table.Column<string>(type: "text", nullable: false),
                     Height = table.Column<float>(type: "real", nullable: false),
                     Weight = table.Column<float>(type: "real", nullable: false),
                     MedicalCenterId = table.Column<string>(type: "text", nullable: true)
@@ -544,19 +546,14 @@ namespace PRMS.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CategoryMedicalCenters_MedicalCenterCategoryId",
-                table: "CategoryMedicalCenters",
-                column: "MedicalCenterCategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CategoryMedicalCenters_MedicalCenterId",
-                table: "CategoryMedicalCenters",
-                column: "MedicalCenterId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Favorites_PatientId",
                 table: "Favorites",
                 column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MedicalCenterCategoryPivot_MedicalCentersId",
+                table: "MedicalCenterCategoryPivot",
+                column: "MedicalCentersId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MedicalCenterReviews_MedicalCenterId",
@@ -651,10 +648,10 @@ namespace PRMS.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "CategoryMedicalCenters");
+                name: "Favorites");
 
             migrationBuilder.DropTable(
-                name: "Favorites");
+                name: "MedicalCenterCategoryPivot");
 
             migrationBuilder.DropTable(
                 name: "MedicalCenterReviews");

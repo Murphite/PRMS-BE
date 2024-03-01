@@ -59,13 +59,14 @@ public class AuthService : IAuthService
 
         return new LoginResponseDto(token);
     }
+    
     public async Task<Result> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
     {
         var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
 
-        var Token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-        var resetPasswordResult = await _userManager.ResetPasswordAsync(user, Token, resetPasswordDto.NewPassword);
+        var resetPasswordResult = await _userManager.ResetPasswordAsync(user, token, resetPasswordDto.NewPassword);
 
         if (!resetPasswordResult.Succeeded)
             return resetPasswordResult.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();

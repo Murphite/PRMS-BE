@@ -6,7 +6,7 @@ using PRMS.Domain.Entities;
 using System.Threading.Tasks;
 
 [ApiController]
-[Route("api/v1/auth")]
+[Route("api/v1/medical-specialists")]
 public class MedicalSpecialistController : Controller
 {
     private readonly IMedicalSpecialistService _medicalSpecialistService;
@@ -18,7 +18,7 @@ public class MedicalSpecialistController : Controller
         this.signInManager = signInManager;
     }
 
-    [HttpGet("/api/v1/medical-specialists")]
+    [HttpGet]
     public async Task<IActionResult> GetAllMedicalSpecialists([FromQuery] PaginationFilter paginationFilter)
     {
         var user = await signInManager.UserManager.GetUserAsync(User);

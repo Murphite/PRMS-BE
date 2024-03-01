@@ -14,6 +14,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\PRMS.Core\PRMS.Core.csproj" />
+        <ProjectReference Include="..\PRMS.Data\PRMS.Data.csproj" />
         <ProjectReference Include="..\PRMS.Domain\PRMS.Domain.csproj" />
     </ItemGroup>
 

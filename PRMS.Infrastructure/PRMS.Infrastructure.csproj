@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
@@ -14,7 +14,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\PRMS.Core\PRMS.Core.csproj" />
-        <ProjectReference Include="..\PRMS.Data\PRMS.Data.csproj" />
         <ProjectReference Include="..\PRMS.Domain\PRMS.Domain.csproj" />
     </ItemGroup>
 

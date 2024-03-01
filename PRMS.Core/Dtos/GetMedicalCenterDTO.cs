@@ -9,18 +9,12 @@ namespace PRMS.Core.Dtos
     public class GetMedicalCenterDTO
     {
         public string Name { get; set; }
-        public string? ImageUrl { get; set; }        
-        public string? Street { get; set; }
+        public string? ImageUrl { get; set; }
         public string? City { get; set; }
         public string? State { get; set; }
-        public string? Country { get; set; }
-
-        public double? Longitude { get; set; }
-        public double? Latitude { get; set; }
-        public List<string>? Categories { get; set; }
-        public int? ReviewCount { get; set; }
+        public double Distance { get; set; }
+        public List<string> Categories { get; set; }
+        public int ReviewCount { get; set; }
         public int? Rating { get; set; }
-
-
     }
 }

@@ -153,13 +153,10 @@ public class DataGenerator
             .RuleFor(m => m.Type, f => f.PickRandom<MedicalCenterType>())
             .Generate();
 
-        var pivot = new Faker<CategoryMedicalCenterPivot>()
-            .RuleFor(p => p.MedicalCenterId, medicalCenter.Id)
-            .RuleFor(p => p.MedicalCenterCategoryId, f => f.PickRandom(_categories).Id)
-            .Generate(2);
-
+        var categories = new Faker().PickRandom(_categories, 2).ToList();
+        medicalCenter.MedicalCenterCategories = categories;
         await _context.MedicalCenters.AddAsync(medicalCenter);
-        await _context.CategoryMedicalCenters.AddRangeAsync(pivot);
+        // await _context.MedicalCenters.AddRangeAsync(pivot);
 
         return medicalCenter;
     }
@@ -178,7 +175,7 @@ public class DataGenerator
                 .RuleFor(p => p.Title, f => f.PickRandom(new[] { "Dr", "Nurse", "Pharm" }))
                 .RuleFor(p => p.Speciality,
                     f => f.PickRandom("Cardiologist", "Dentist", "Neurologist", "Surgeon", "Gynecologist", "Pediatrics",
-                        "Orthoopedic Surgeon", "Psychiatrist"))
+                        "Orthopedic Surgeon", "Psychiatrist"))
                 .RuleFor(p => p.About, f => f.Lorem.Paragraphs(3))
                 .RuleFor(p => p.WorkingTime, "Monday-Friday, 8am-6pm")
                 .RuleFor(p => p.YearsOfExperience, f => f.Random.Int(2, 30))

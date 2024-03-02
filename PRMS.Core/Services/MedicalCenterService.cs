@@ -5,11 +5,13 @@ using PRMS.Core.Dtos;
 using PRMS.Core.Utilities;
 using PRMS.Data.Contexts;
 using PRMS.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 
+namespace PRMS.Core.Services;
 public class MedicalCenterService : IMedicalCenterService
 {
     private readonly IRepository _repository;
@@ -56,9 +58,6 @@ public class MedicalCenterService : IMedicalCenterService
         }
     }
 
-
-
-
     public static class GeoCalculator
     {
         private const double EarthRadiusKm = 6371;
@@ -83,5 +82,5 @@ public class MedicalCenterService : IMedicalCenterService
             return degrees * Math.PI / 180;
         }
     }
-
 }
+

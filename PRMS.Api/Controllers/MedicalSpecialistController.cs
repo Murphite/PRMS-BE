@@ -5,6 +5,8 @@ using PRMS.Core.Dtos;
 using PRMS.Domain.Entities;
 using System.Threading.Tasks;
 
+namespace PRMS.Api.Controllers;
+
 [ApiController]
 [Route("api/v1/medical-specialists")]
 public class MedicalSpecialistController : Controller

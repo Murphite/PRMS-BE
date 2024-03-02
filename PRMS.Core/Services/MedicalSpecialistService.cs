@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+namespace PRMS.Core.Services;
+
 public class MedicalSpecialistService : IMedicalSpecialistService
 {
     private readonly IRepository _repository;

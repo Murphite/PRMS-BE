@@ -55,10 +55,22 @@ public class AuthController : ControllerBase
         return Ok(ResponseDto<object>.Success(resetPasswordResult));
     }
 
+
     [HttpPost("ForgotPassword")]
     public async Task<IActionResult> ForgotPassword([FromBody] ResetPasswordDto resetPasswordDto)
     {
         var result = await _authService.ForgotPassword(resetPasswordDto);
+        
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success());
+    }
+
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
+    {
+        var result = await _authService.ConfirmEmail(email, token);
 
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));

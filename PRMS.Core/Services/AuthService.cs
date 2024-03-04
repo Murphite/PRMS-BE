@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Constants;
 using PRMS.Domain.Entities;
+using System.Web;
 
 namespace PRMS.Core.Services;
 
@@ -11,12 +13,17 @@ public class AuthService : IAuthService
     private readonly IJwtService _jwtService;
     private readonly UserManager<User> _userManager;
     private readonly IRepository _repository;
+	private readonly IHttpContextAccessor _httpContextAccessor;
+	private readonly IEmailService _emailService;
 
-    public AuthService(UserManager<User> userManager, IRepository repository, IJwtService jwtService)
+	public AuthService(UserManager<User> userManager, IRepository repository, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, IEmailService emailService)
     {
         _userManager = userManager;
         _repository = repository;
         _jwtService = jwtService;
+        _httpContextAccessor = httpContextAccessor;
+        _emailService = emailService;
+       
     }
 
     public async Task<Result> Register(RegisterUserDto registerUserDto)
@@ -42,7 +49,61 @@ public class AuthService : IAuthService
         return Result.Success();
     }
 
-    public async Task<Result<LoginResponseDto>> Login(LoginUserDto loginUserDto)
+	public async Task<Result> AdminRegister(AdminRegisterDTO registerAdminDto)
+	{
+		var emailExist = await _userManager.FindByEmailAsync(registerAdminDto.Email);
+		if (emailExist != null)
+			return new Error[] { new("Registration.Error", "email already exist") };
+		var user = new User
+		{
+			FirstName = registerAdminDto.FirstName,
+			MiddleName = registerAdminDto.MiddleName,
+			LastName = registerAdminDto.LastName,
+			Email = registerAdminDto.Email,
+			PhoneNumber = registerAdminDto.PhoneNumber,
+			ImageUrl = registerAdminDto.ImageUrl,
+			PublicId = registerAdminDto.PublicId,
+			UserName = registerAdminDto.Email,
+			CreatedAt = DateTimeOffset.UtcNow,
+			UpdatedAt = DateTimeOffset.UtcNow,
+			Address = new Address
+			{
+				Street = registerAdminDto.Street,
+				City = registerAdminDto.City,
+				State = registerAdminDto.State,
+				Country = registerAdminDto.Country,
+				CreatedAt = DateTimeOffset.UtcNow,
+				UpdatedAt = DateTimeOffset.UtcNow
+
+			}
+		};
+
+		var result = await _userManager.CreateAsync(user, registerAdminDto.Password);
+
+		if (!result.Succeeded)
+			return (result.Errors.Select(error => new Error(error.Code, error.Description)).ToArray());
+
+		result = await _userManager.AddToRoleAsync(user, RolesConstant.Admin);
+		if (!result.Succeeded)
+			return result.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();
+
+		var request = _httpContextAccessor.HttpContext.Request;
+		var baseUrl = $"{request.Scheme}://{request.Host}";
+
+		var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+		var encodedEmail = HttpUtility.UrlEncode(user.Email);
+		var encodedToken = HttpUtility.UrlEncode(token);
+		var confirmationLink = $"{baseUrl}/confirm-email?email={encodedEmail}&token={encodedToken}";
+		var body = @$"Hi {user.FirstName},
+         Please click the link <a href='{confirmationLink}'>here</a> to confirm your account's email";
+		var emailreusult= await _emailService.SendEmailAsync(user.Email, "Confirm Email", body);
+        if(emailreusult==false)
+			return new Error[] { new("Registration.Error", "Account has been created but error occured while sending verification email") };
+
+		return Result.Success();
+	}
+
+	public async Task<Result<LoginResponseDto>> Login(LoginUserDto loginUserDto)
     {
         var user = await _userManager.FindByEmailAsync(loginUserDto.Email);
 

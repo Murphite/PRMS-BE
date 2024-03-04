@@ -19,11 +19,11 @@ namespace PRMS.Core.Services
             _UserManager = UserManager;
         }
 
-        public async Task<Result> UpdateFromPatientAsync(UpdatePatientFromPatientDto dto, string userId)
+        public async Task<Result> UpdateFromPatientAsync(UpdatePatientFromPatientDto dto, string UserId)
         {
             try
             {
-                var user = await _UserManager.FindByIdAsync(userId);
+                var user = await _UserManager.FindByIdAsync(UserId);
 
                 if (user == null)
                 {
@@ -31,7 +31,8 @@ namespace PRMS.Core.Services
                 }
 
                 // Find the patient by user id
-                var patient = await _repository.FindById<Patient>(userId);
+                var AllPatient = _repository.GetAll<Patient>();
+                var patient = AllPatient.FirstOrDefault(x => x.UserId == user.Id);
 
                 if (patient == null)
                 {

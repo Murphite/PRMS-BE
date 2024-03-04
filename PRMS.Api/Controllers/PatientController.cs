@@ -17,20 +17,10 @@ namespace PRMS.Api.Controllers
             _patientService = patientService;
         }
 
-        [HttpPut("update-from-patient")]
+        [HttpPut]
         public async Task<IActionResult> UpdateFromPatient([FromBody] UpdatePatientFromPatientDto dto, string UserId)
         {
             var result = await _patientService.UpdateFromPatientAsync(dto, UserId);
-            if (result.IsFailure)
-                return BadRequest(ResponseDto<object>.Failure(result.Errors));
-
-            return Ok(ResponseDto<object>.Success());
-        }
-
-        [HttpPut("update-from-doctor")]
-        public async Task<IActionResult> UpdateFromDoctor([FromBody] UpdatePatientFromDoctorDto dto, string patientId)
-        {
-            var result = await _patientService.UpdateFromDoctorAsync(dto, patientId);
             if (result.IsFailure)
                 return BadRequest(ResponseDto<object>.Failure(result.Errors));
 

@@ -22,9 +22,5 @@ namespace PRMS.Core.Dtos
         public string? EmergencyContactName { get; set; }
         public string? EmergencyContactPhoneNo { get; set; }
         public string? EmergencyContactRelationship { get; set; }
-        public string? Dosage { get; set; }
-        public string? Frequency { get; set; }
-        public string? MedicationName { get; set; }
-        public string? Value { get; set; }
     }
 }

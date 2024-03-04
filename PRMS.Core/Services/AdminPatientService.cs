@@ -1,36 +1,37 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
-using PRMS.Data.Contexts;
 using PRMS.Domain.Entities;
-using PRMS.Domain.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace PRMS.Core.Services
 {
-    public class PatientService : IPatientService
+    public class AdminPatientService : IAdminPatientService
     {
         private readonly IRepository _repository;
         private readonly UserManager<User> _UserManager;
 
-        public PatientService(IRepository repository, UserManager<User> UserManager)
+        public AdminPatientService(IRepository repository, UserManager<User> UserManager)
         {
             _repository = repository;
             _UserManager = UserManager;
         }
 
-        public async Task<Result> UpdateFromPatientAsync(UpdatePatientFromPatientDto dto, string UserId)
+        public async Task<Result> UpdateFromAdminAsync(UpdatePatientFromAdminDto dto, string patientId)
         {
-                var user = await _UserManager.FindByIdAsync(UserId);
+                var user = await _UserManager.FindByIdAsync(patientId);
 
                 if (user == null)
                 {
-                    return new Error[] { new Error("User.Error", "User Not Found") };
+                    return new Error[] { new Error("Patient.Error", "Patient Not Found") };
                 }
 
                 // Find the patient by user id
-                var AllPatient = _repository.GetAll<Patient>();
-                var patient = AllPatient.FirstOrDefault(x => x.UserId == user.Id);
+                var patient = await _repository.FindById<Patient>(patientId);
 
                 if (patient == null)
                 {
@@ -62,7 +63,7 @@ namespace PRMS.Core.Services
                 _repository.Update(patient);
 
                 // Create and return a DTO representing the updated patient
-                var updateDTO = new UpdatePatientFromPatientDto
+                var updateDTO = new UpdatePatientFromAdminDto
                 {
                     DateOfBirth = patient.DateOfBirth,
                     Gender = patient.Gender,

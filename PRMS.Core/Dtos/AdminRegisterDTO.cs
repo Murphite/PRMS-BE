@@ -13,8 +13,6 @@ namespace PRMS.Core.Dtos
 		public string? MiddleName { get; init; }
 		[Required] public string LastName { get; init; }
 		[Required] public string PhoneNumber { get; init; }
-		public string? ImageUrl { get; init; }
-		public string? PublicId { get; init; }
 		[Required] public string Street { get; init; }
 		[Required] public string City { get; init; }
 		[Required] public string State { get; init; }

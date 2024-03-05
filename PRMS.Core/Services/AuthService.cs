@@ -14,16 +14,14 @@ public class AuthService : IAuthService
     private readonly IJwtService _jwtService;
     private readonly UserManager<User> _userManager;
     private readonly IRepository _repository;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IEmailService _emailService;
     private readonly IConfiguration _configuration;
 
-	public AuthService(UserManager<User> userManager, IRepository repository, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, IEmailService emailService, IConfiguration configuration)
+	public AuthService(UserManager<User> userManager, IRepository repository, IJwtService jwtService, IEmailService emailService, IConfiguration configuration)
     {
         _userManager = userManager;
         _repository = repository;
         _jwtService = jwtService;
-        _httpContextAccessor = httpContextAccessor;
         _emailService = emailService;
         _configuration = configuration;
        
@@ -88,14 +86,12 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
             return result.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();
 
-        var request = _httpContextAccessor.HttpContext.Request;
-		var frontendUrl = _configuration["FrontendUrl"];
+		var confirmEmailUrl = _configuration["ConfirmEmailUrl"];
 		var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedEmail = HttpUtility.UrlEncode(user.Email);
         var encodedToken = HttpUtility.UrlEncode(token);
-
-        var confirmationLink = $"{frontendUrl}/confirm-email?email={encodedEmail}&token={encodedToken}";
-        var body = @$"Hi {user.FirstName},
+		var confirmationLink = $"{confirmEmailUrl}?email={encodedEmail}&token={encodedToken}";
+		var body = @$"Hi {user.FirstName},
          Please click the link <a href='{confirmationLink}'>here</a> to confirm your account's email";
         var emailreusult= await _emailService.SendEmailAsync(user.Email, "Confirm Email", body);
 

@@ -63,6 +63,5 @@ public static class ServiceRegistration
         services.AddScoped<IRepository, Repository>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IEmailService, EmailService>();
-        services.AddHttpContextAccessor();
     }
 }

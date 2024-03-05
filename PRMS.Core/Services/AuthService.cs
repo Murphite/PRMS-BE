@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Constants;
@@ -15,14 +16,16 @@ public class AuthService : IAuthService
     private readonly IRepository _repository;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
 
-    public AuthService(UserManager<User> userManager, IRepository repository, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, IEmailService emailService)
+	public AuthService(UserManager<User> userManager, IRepository repository, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, IEmailService emailService, IConfiguration configuration)
     {
         _userManager = userManager;
         _repository = repository;
         _jwtService = jwtService;
         _httpContextAccessor = httpContextAccessor;
         _emailService = emailService;
+        _configuration = configuration;
        
     }
 
@@ -86,17 +89,18 @@ public class AuthService : IAuthService
             return result.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();
 
         var request = _httpContextAccessor.HttpContext.Request;
-        var baseUrl = $"{request.Scheme}://{request.Host}";
-
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+		var frontendUrl = _configuration["FrontendUrl"];
+		var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedEmail = HttpUtility.UrlEncode(user.Email);
         var encodedToken = HttpUtility.UrlEncode(token);
-        var confirmationLink = $"{baseUrl}/confirm-email?email={encodedEmail}&token={encodedToken}";
+
+        var confirmationLink = $"{frontendUrl}/confirm-email?email={encodedEmail}&token={encodedToken}";
         var body = @$"Hi {user.FirstName},
          Please click the link <a href='{confirmationLink}'>here</a> to confirm your account's email";
         var emailreusult= await _emailService.SendEmailAsync(user.Email, "Confirm Email", body);
+
         if(emailreusult==false)
-            return new Error[] { new("Registration.Error", "Account has been created but error occured while sending verification email") };
+            return new Error[] { new("Registration.Error", "Account has been created succesfully but error occured while sending verification email") };
 
         return Result.Success();
     }

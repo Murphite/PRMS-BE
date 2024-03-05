@@ -7,6 +7,7 @@ using PRMS.Domain.Constants;
 using PRMS.Domain.Entities;
 using System.Web;
 
+
 namespace PRMS.Core.Services;
 
 public class AuthService : IAuthService
@@ -24,7 +25,6 @@ public class AuthService : IAuthService
         _jwtService = jwtService;
         _emailService = emailService;
         _configuration = configuration;
-       
     }
 
     public async Task<Result> Register(RegisterUserDto registerUserDto)
@@ -83,19 +83,19 @@ public class AuthService : IAuthService
             return (result.Errors.Select(error => new Error(error.Code, error.Description)).ToArray());
 
         result = await _userManager.AddToRoleAsync(user, RolesConstant.Admin);
+        
         if (!result.Succeeded)
             return result.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();
 
-		var confirmEmailUrl = _configuration["ConfirmEmailUrl"];
-		var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+		    var confirmEmailUrl = _configuration["ConfirmEmailUrl"];
+		    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedEmail = HttpUtility.UrlEncode(user.Email);
         var encodedToken = HttpUtility.UrlEncode(token);
-		var confirmationLink = $"{confirmEmailUrl}?email={encodedEmail}&token={encodedToken}";
-		var body = @$"Hi {user.FirstName},
-         Please click the link <a href='{confirmationLink}'>here</a> to confirm your account's email";
-        var emailreusult= await _emailService.SendEmailAsync(user.Email, "Confirm Email", body);
+		    var confirmationLink = $"{confirmEmailUrl}?email={encodedEmail}&token={encodedToken}";
+		    var body = @$"Hi {user.FirstName}, Please click the link <a href='{confirmationLink}'>here</a> to confirm your account's email";
+        var emailResult = await _emailService.SendEmailAsync(user.Email, "Confirm Email", body);
 
-        if(emailreusult==false)
+        if(!emailResult)
             return new Error[] { new("Registration.Error", "Account has been created succesfully but error occured while sending verification email") };
 
         return Result.Success();
@@ -130,6 +130,24 @@ public class AuthService : IAuthService
         if (!resetPasswordResult.Succeeded)
             return resetPasswordResult.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();
 
+        return Result.Success();
+    }
+
+    public async Task<Result> ForgotPassword(ResetPasswordDto resetPasswordDto)
+    {
+        var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+
+        if (user == null)
+            return new Error[] { new Error("Auth.Error", "No user found with the provided email") };
+
+        var resetLink = ResetPasswordAsync(resetPasswordDto);
+
+        var emailSubject = "Your New Password";
+
+        var emailBody = $"Hello {user.FirstName}, click this link to reset your password: {resetLink}.";
+
+        var emailForgotPassword = await _emailService.SendEmailAsync(resetPasswordDto.Email, emailSubject, emailBody);
+        
         return Result.Success();
     }
 

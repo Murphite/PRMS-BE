@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 
 namespace PRMS.Core.Services;
+
 public class MedicalCenterService : IMedicalCenterService
 {
     private readonly IRepository _repository;

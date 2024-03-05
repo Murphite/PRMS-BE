@@ -10,4 +10,5 @@ public interface IAuthService
     public Task<Result> ForgotPassword(ResetPasswordDto resetPasswordDto);
     public Task<Result> ConfirmEmail(string email, string token);
     public Task<Result> ChangePasswordAsync(ChangePasswordDto changePasswordDto);
+	public Task<Result> AdminRegister(AdminRegisterDTO registerAdminDto);
 }

@@ -17,6 +17,6 @@ public static class DbRegistration
                 }));
 
         services.AddIdentity<User, IdentityRole>()
-            .AddEntityFrameworkStores<AppDbContext>();
+            .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
     }
 }

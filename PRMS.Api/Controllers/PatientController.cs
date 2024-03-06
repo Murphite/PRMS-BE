@@ -9,7 +9,7 @@ using PRMS.Domain.Entities;
 namespace PRMS.Api.Controllers
 {
     [ApiController]
-    // [Authorize]
+    [Authorize]
     [Route("api/v1/patients")]
     public class PatientController : ControllerBase
     {
@@ -25,8 +25,7 @@ namespace PRMS.Api.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateFromPatient([FromBody] UpdatePatientFromPatientDto dto)
         {
-            // var userId = _userManager.GetUserId(User);
-            var userId = "5f4490e7-65e4-45e7-9c1f-dc03b04a3bb2";
+            var userId = _userManager.GetUserId(User);
             var result = await _patientService.UpdateFromPatientAsync(dto, userId!);
             if (result.IsFailure)
                 return BadRequest(ResponseDto<object>.Failure(result.Errors));

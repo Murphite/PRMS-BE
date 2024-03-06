@@ -50,9 +50,9 @@ public static class ServiceRegistration
             var key = Encoding.UTF8.GetBytes(configuration.GetSection("JWT:Key").Value);
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuerSigningKey = true,
+                ValidateIssuerSigningKey = false,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateLifetime = true,
+                ValidateLifetime = false,
                 ValidateAudience = false,
                 ValidateIssuer = false
             };

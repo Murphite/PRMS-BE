@@ -25,39 +25,32 @@ public class MedicalSpecialistService : IMedicalSpecialistService
 
     public async Task<Result<PaginatorDto<IEnumerable<GetMedicalSpecialistDTO>>>> GetAll(string userId, PaginationFilter paginationFilter)
     {
-        try
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
+            return Result.Failure<PaginatorDto<IEnumerable<GetMedicalSpecialistDTO>>>(new[] { new Error("User.Error", "User Not Found") });
+        }
+
+        var medicalSpecialistsQuery = _repository.GetAll<Physician>()
+            .Select(ms => new GetMedicalSpecialistDTO
             {
-                return Result.Failure<PaginatorDto<IEnumerable<GetMedicalSpecialistDTO>>>(new[] { new Error("User.Error", "User Not Found") });
-            }
+                FirstName = ms.User.FirstName,
+                LastName = ms.User.LastName,
+                MiddleName = ms.User.MiddleName,
+                ImageUrl = ms.User.ImageUrl,
+                Title = ms.Title,
+                Speciality = ms.Speciality,
+                Street = ms.User.Address.Street,
+                City = ms.User.Address.City,
+                State = ms.User.Address.State,
+                MedicalCenterName = ms.MedicalCenter.Name,
+                ReviewCount = ms.Reviews.Count(), // No need for null check here
+                Rating = (int)Math.Round(ms.Reviews.Average(r => r.Rating)) // No need for null check here
+            });
 
-            var medicalSpecialistsQuery = _repository.GetAll<Physician>()
-                .Select(ms => new GetMedicalSpecialistDTO
-                {
-                    FirstName = ms.User.FirstName,
-                    LastName = ms.User.LastName,
-                    MiddleName = ms.User.MiddleName,
-                    ImageUrl = ms.User.ImageUrl,
-                    Title = ms.Title,
-                    Speciality = ms.Speciality,
-                    Street = ms.User.Address.Street,
-                    City = ms.User.Address.City,
-                    State = ms.User.Address.State,
-                    MedicalCenterName = ms.MedicalCenter.Name,
-                    ReviewCount = ms.Reviews.Count(), // No need for null check here
-                    Rating = (int)Math.Round(ms.Reviews.Average(r => r.Rating)) // No need for null check here
-                });
+        var paginatedMedicalSpecialists = await medicalSpecialistsQuery.Paginate(paginationFilter);
 
-            var paginatedMedicalSpecialists = await medicalSpecialistsQuery.Paginate(paginationFilter);
-
-            return Result.Success(paginatedMedicalSpecialists);
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure<PaginatorDto<IEnumerable<GetMedicalSpecialistDTO>>>(new[] { new Error(ex.Message, "EXCEPTION") });
-        }
+        return Result.Success(paginatedMedicalSpecialists);
     }
 
 }

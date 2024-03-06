@@ -11,6 +11,9 @@ public class Patient: Entity, IAuditable
     public string? PrimaryPhysicanName { get; set; }
     public string? PrimaryPhysicanEmail { get; set; }
     public string? PrimaryPhysicanPhoneNo { get; set; }
+    public string EmergencyContactName { get; set; }
+    public string EmergencyContactRelationship { get; set; }
+    public string EmergencyContactPhoneNo { get; set; }
     public float Height { get; set; }
     public float Weight { get; set; }
     public DateTimeOffset CreatedAt { get; }

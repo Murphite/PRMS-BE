@@ -10,7 +10,6 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<MedicalCenter> MedicalCenters { get; set; }
     public DbSet<MedicalCenterCategory> MedicalCenterCategories { get; set; }
     public DbSet<MedicalCenterReview> MedicalCenterReviews { get; set; }
-    public DbSet<CategoryMedicalCenterPivot> CategoryMedicalCenters { get; set; }
     public DbSet<Patient> Patients { get; set; }
     public DbSet<Physician> Physicians { get; set; }
     public DbSet<PhysicianReview> PhysicianReviews { get; set; }
@@ -22,5 +21,15 @@ public class AppDbContext : IdentityDbContext<User>
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
+    }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<MedicalCenter>()
+            .HasMany(mc => mc.MedicalCenterCategories)
+            .WithMany(mcc => mcc.MedicalCenters)
+            .UsingEntity(j => j.ToTable("MedicalCenterCategoryPivot"));
     }
 }

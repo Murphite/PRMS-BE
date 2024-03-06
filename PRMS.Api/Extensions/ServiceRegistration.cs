@@ -64,5 +64,7 @@ public static class ServiceRegistration
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IMedicalSpecialistService, MedicalSpecialistService>();
+        services.AddScoped<IPatientService, PatientService>();
+        services.AddScoped<IAdminPatientService, AdminPatientService>();
     }
 }

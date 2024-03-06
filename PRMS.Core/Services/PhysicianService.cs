@@ -12,27 +12,29 @@ using System.Threading.Tasks;
 
 namespace PRMS.Core.Services;
 
-public class MedicalSpecialistService : IMedicalSpecialistService
+public class PhysicianService : IPhysicianService
 {
     private readonly IRepository _repository;
     private readonly UserManager<User> _userManager;
 
-    public MedicalSpecialistService(IRepository repository, UserManager<User> userManager)
+    public PhysicianService(IRepository repository, UserManager<User> userManager)
     {
         _repository = repository;
         _userManager = userManager;
     }
 
-    public async Task<Result<PaginatorDto<IEnumerable<GetMedicalSpecialistDTO>>>> GetAll(string userId, PaginationFilter paginationFilter)
+    public async Task<Result<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>> GetAll(string userId, PaginationFilter paginationFilter)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            return Result.Failure<PaginatorDto<IEnumerable<GetMedicalSpecialistDTO>>>(new[] { new Error("User.Error", "User Not Found") });
+            //return Result.Failure(new[] { new Error("User.Error", "User Not Found") }); this one does not work because the Failure method expects an IEnumerable<Error> as its parameter. 
+            //return Result.Failure<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>(new[] { new Error("User.Error", "User Not Found") });
+            return new Error[] { new("User.Error", "User Not Found") };
         }
 
-        var medicalSpecialistsQuery = _repository.GetAll<Physician>()
-            .Select(ms => new GetMedicalSpecialistDTO
+        var physicansQuery = _repository.GetAll<Physician>()
+            .Select(ms => new GetPhysiciansDTO
             {
                 FirstName = ms.User.FirstName,
                 LastName = ms.User.LastName,
@@ -48,9 +50,10 @@ public class MedicalSpecialistService : IMedicalSpecialistService
                 Rating = (int)Math.Round(ms.Reviews.Average(r => r.Rating)) // No need for null check here
             });
 
-        var paginatedMedicalSpecialists = await medicalSpecialistsQuery.Paginate(paginationFilter);
+        var paginatedPhysicans = await physicansQuery.Paginate(paginationFilter);
 
-        return Result.Success(paginatedMedicalSpecialists);
+        return Result.Success(paginatedPhysicans);
     }
+
 
 }

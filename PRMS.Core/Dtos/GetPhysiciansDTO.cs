@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PRMS.Core.Dtos
 {
-    public class GetMedicalSpecialistDTO
+    public class GetPhysiciansDTO
     {
         //PHYSICICAN USER DETAILS
         public string FirstName { get; set; }

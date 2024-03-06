@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace PRMS.Core.Abstractions
 {
-    public interface IMedicalSpecialistService
+    public interface IPhysicianService
     {
-        Task<Result<PaginatorDto<IEnumerable<GetMedicalSpecialistDTO>>>> GetAll(string userId, PaginationFilter paginationFilter);
+        Task<Result<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>> GetAll(string userId, PaginationFilter paginationFilter);
     }
 }

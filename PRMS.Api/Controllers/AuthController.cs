@@ -71,7 +71,7 @@ public class AuthController : ControllerBase
     }
 
 
-    [HttpPost("ForgotPassword")]
+    [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ResetPasswordDto resetPasswordDto)
     {
         var result = await _authService.ForgotPassword(resetPasswordDto);

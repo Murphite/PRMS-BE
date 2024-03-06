@@ -26,38 +26,33 @@ public class MedicalCenterService : IMedicalCenterService
 
     public async Task<Result<PaginatorDto<IEnumerable<GetMedicalCenterDTO>>>> GetAll(string userId, double? userLatitude, double? userLongitude, PaginationFilter paginationFilter)
     {
-        try
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
+            //return Result.Failure<PaginatorDto<IEnumerable<GetMedicalCenterDTO>>>(new[] { new Error("User.Error", "User Not Found") });
+            return new Error[] { new("User.Error", "User Not Found") };
+        }
+
+        var medicalCentersQuery = _repository.GetAll<MedicalCenter>()
+            .Select(mc => new GetMedicalCenterDTO
             {
-                return Result.Failure<PaginatorDto<IEnumerable<GetMedicalCenterDTO>>>(new[] { new Error("User.Error", "User Not Found") });
-            }
+                Name = mc.Name,
+                ImageUrl = mc.ImageUrl,
+                City = mc.Address.City,
+                State = mc.Address.State,
+                ReviewCount = mc.Reviews.Count(),
+                Rating = (int)Math.Round(mc.Reviews.Average(r => r.Rating)),
+                Distance = userLatitude.HasValue && userLongitude.HasValue
+                    ? GeoCalculator.CalculateDistance(userLatitude.Value, userLongitude.Value, mc.Address.Latitude ?? 0, mc.Address.Longitude ?? 0)
+                    : 0, // Default distance if user's location is not available
+                Categories = mc.CategoryPivot.Select(cp => cp.MedicalCenterCategory.Name).ToList()
+            });
 
-            var medicalCentersQuery = _repository.GetAll<MedicalCenter>()
-                .Select(mc => new GetMedicalCenterDTO
-                {
-                    Name = mc.Name,
-                    ImageUrl = mc.ImageUrl,
-                    City = mc.Address.City,
-                    State = mc.Address.State,
-                    ReviewCount = mc.Reviews.Count(),
-                    Rating = (int)Math.Round(mc.Reviews.Average(r => r.Rating)),
-                    Distance = userLatitude.HasValue && userLongitude.HasValue
-                        ? GeoCalculator.CalculateDistance(userLatitude.Value, userLongitude.Value, mc.Address.Latitude ?? 0, mc.Address.Longitude ?? 0)
-                        : 0, // Default distance if user's location is not available
-                    Categories = mc.CategoryPivot.Select(cp => cp.MedicalCenterCategory.Name).ToList()
-                });
+        var paginatedMedicalCenters = await medicalCentersQuery.Paginate(paginationFilter);
 
-            var paginatedMedicalCenters = await medicalCentersQuery.Paginate(paginationFilter);
-
-            return Result.Success(paginatedMedicalCenters);
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure<PaginatorDto<IEnumerable<GetMedicalCenterDTO>>>(new[] { new Error(ex.Message, "EXCEPTION") });
-        }
+        return Result.Success(paginatedMedicalCenters);
     }
+
 
     public static class GeoCalculator
     {

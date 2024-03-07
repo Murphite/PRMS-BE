@@ -17,26 +17,47 @@ public class AuthService : IAuthService
     private readonly IRepository _repository;
     private readonly IEmailService _emailService;
     private readonly IConfiguration _configuration;
+    private readonly IUnitOfWork _unitOfWork;
 
-	public AuthService(UserManager<User> userManager, IRepository repository, IJwtService jwtService, IEmailService emailService, IConfiguration configuration)
+    public AuthService(UserManager<User> userManager, IRepository repository, IJwtService jwtService,
+        IEmailService emailService, IConfiguration configuration, IUnitOfWork unitOfWork)
     {
         _userManager = userManager;
         _repository = repository;
         _jwtService = jwtService;
         _emailService = emailService;
         _configuration = configuration;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result> Register(RegisterUserDto registerUserDto)
     {
+        var address = new Address
+        {
+            Street = registerUserDto.Street,
+            City = registerUserDto.City,
+            State = registerUserDto.State,
+            Country = registerUserDto.Country,
+            Latitude = registerUserDto.Latitude,
+            Longitude = registerUserDto.Longitude
+        };
+
         var user = new User
         {
             FirstName = registerUserDto.FirstName,
             LastName = registerUserDto.LastName,
             Email = registerUserDto.Email,
             PhoneNumber = registerUserDto.PhoneNumber,
-            UserName = registerUserDto.Email
+            UserName = registerUserDto.Email,
+            AddressId = address.Id,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow,
         };
+
+        await _repository.Add(address);
+        var isSaved = await _unitOfWork.SaveChangesAsync() > 0;
+        if(!isSaved)
+            return new Error[] { new("Address.NotSaved", "Address not saved")};
 
         var result = await _userManager.CreateAsync(user, registerUserDto.Password);
 
@@ -53,8 +74,10 @@ public class AuthService : IAuthService
     public async Task<Result> AdminRegister(AdminRegisterDTO registerAdminDto)
     {
         var emailExist = await _userManager.FindByEmailAsync(registerAdminDto.Email);
+        
         if (emailExist != null)
             return new Error[] { new("Registration.Error", "email already exist") };
+        
         var user = new User
         {
             FirstName = registerAdminDto.FirstName,
@@ -73,30 +96,32 @@ public class AuthService : IAuthService
                 Country = registerAdminDto.Country,
                 CreatedAt = DateTimeOffset.UtcNow,
                 UpdatedAt = DateTimeOffset.UtcNow
-
             }
         };
 
         var result = await _userManager.CreateAsync(user, registerAdminDto.Password);
-
         if (!result.Succeeded)
             return (result.Errors.Select(error => new Error(error.Code, error.Description)).ToArray());
 
         result = await _userManager.AddToRoleAsync(user, RolesConstant.Admin);
-        
         if (!result.Succeeded)
             return result.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();
 
-		    var confirmEmailUrl = _configuration["ConfirmEmailUrl"];
-		    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var confirmEmailUrl = _configuration["ConfirmEmailUrl"];
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedEmail = HttpUtility.UrlEncode(user.Email);
         var encodedToken = HttpUtility.UrlEncode(token);
-		    var confirmationLink = $"{confirmEmailUrl}?email={encodedEmail}&token={encodedToken}";
-		    var body = @$"Hi {user.FirstName}, Please click the link <a href='{confirmationLink}'>here</a> to confirm your account's email";
+        var confirmationLink = $"{confirmEmailUrl}?email={encodedEmail}&token={encodedToken}";
+        var body =
+            @$"Hi {user.FirstName}, Please click the link <a href='{confirmationLink}'>here</a> to confirm your account's email";
         var emailResult = await _emailService.SendEmailAsync(user.Email, "Confirm Email", body);
-
-        if(!emailResult)
-            return new Error[] { new("Registration.Error", "Account has been created succesfully but error occured while sending verification email") };
+        
+        if (!emailResult)
+            return new Error[]
+            {
+                new("Registration.Error",
+                    "Account has been created successfully but error occured while sending verification email")
+            };
 
         return Result.Success();
     }
@@ -118,14 +143,14 @@ public class AuthService : IAuthService
 
         return new LoginResponseDto(token);
     }
-    
+
     public async Task<Result> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
     {
         var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
-
-        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-        var resetPasswordResult = await _userManager.ResetPasswordAsync(user, token, resetPasswordDto.NewPassword);
+        if(user is null)
+            return new Error[] { new("Auth.Error", "No user found with the provided email") };
+        
+        var resetPasswordResult = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
 
         if (!resetPasswordResult.Succeeded)
             return resetPasswordResult.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();
@@ -138,16 +163,19 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
 
         if (user == null)
-            return new Error[] { new Error("Auth.Error", "No user found with the provided email") };
+            return new Error[] { new("Auth.Error", "No user found with the provided email") };
 
-        var resetLink = ResetPasswordAsync(resetPasswordDto);
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var resetLink = $"{_configuration["ResetPasswordUrl"]}?email={HttpUtility.UrlEncode(user.Email)}&token={HttpUtility.UrlEncode(token)}";
 
-        var emailSubject = "Your New Password";
+        const string emailSubject = "Your New Password";
 
         var emailBody = $"Hello {user.FirstName}, click this link to reset your password: {resetLink}.";
 
-        var emailForgotPassword = await _emailService.SendEmailAsync(resetPasswordDto.Email, emailSubject, emailBody);
-        
+        var isSuccessful = await _emailService.SendEmailAsync(resetPasswordDto.Email, emailSubject, emailBody);
+        if(!isSuccessful)
+            return new Error[] { new("Auth.Error", "Error occured while sending reset password email") };
+
         return Result.Success();
     }
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
@@ -7,20 +9,24 @@ using PRMS.Domain.Entities;
 namespace PRMS.Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/v1/patients")]
     public class PatientController : ControllerBase
     {
         private readonly IPatientService _patientService;
+        private readonly UserManager<User> _userManager;
 
-        public PatientController(IPatientService patientService)
+        public PatientController(IPatientService patientService, UserManager<User> userManager)
         {
             _patientService = patientService;
+            _userManager = userManager;
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateFromPatient([FromBody] UpdatePatientFromPatientDto dto, string UserId)
+        public async Task<IActionResult> UpdateFromPatient([FromBody] UpdatePatientFromPatientDto dto)
         {
-            var result = await _patientService.UpdateFromPatientAsync(dto, UserId);
+            var userId = _userManager.GetUserId(User);
+            var result = await _patientService.UpdateFromPatientAsync(dto, userId!);
             if (result.IsFailure)
                 return BadRequest(ResponseDto<object>.Failure(result.Errors));
 

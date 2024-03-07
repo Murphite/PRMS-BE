@@ -15,6 +15,7 @@ public class Physician : Entity, IAuditable
 
     public User User { get; set; }
     public MedicalCenter MedicalCenter { get; set; }
+    public ICollection<Patient> Patients { get; set; }
     public ICollection<PhysicianReview> Reviews { get; set; }
     public ICollection<Appointment> Appointments { get; set; }
 }

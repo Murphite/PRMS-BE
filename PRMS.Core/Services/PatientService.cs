@@ -2,6 +2,7 @@
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Entities;
+using PRMS.Domain.Enums;
 
 namespace PRMS.Core.Services;
 
@@ -57,5 +58,21 @@ public class PatientService : IPatientService
         await _unitOfWork.SaveChangesAsync();
 
         return Result.Success();
+    }
+
+    public async Task<Result> UpdateAppointmentStatusAsync(string patientId, AppointmentStatus status)
+    {
+        var appointment = _repository.GetAll<Appointment>().FirstOrDefault(a => a.PatientId == patientId);
+
+        if (appointment == null)
+        {
+            return new Error[] { new Error("Appointment.Error", "No Appointment") };
+        }
+
+        appointment.Status = status;
+
+            _repository.Update(appointment);
+            await _unitOfWork.SaveChangesAsync();
+            return Result.Success();
     }
 }

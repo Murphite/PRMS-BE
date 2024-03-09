@@ -62,6 +62,13 @@ public class PatientService : IPatientService
 
     public async Task<Result> UpdateAppointmentStatusAsync(string patientId, AppointmentStatus status)
     {
+        var user = await _userManager.FindByIdAsync(patientId);
+
+        if (user == null)
+        {
+            return new Error[] { new("User.Error", "User Not Found") };
+        }
+
         var appointment = _repository.GetAll<Appointment>().FirstOrDefault(a => a.PatientId == patientId);
 
         if (appointment == null)

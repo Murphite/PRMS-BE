@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace PRMS.Api.Controllers
 {
-    public class PhysicianController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PhysicianController : ControllerBase
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
     }
 }

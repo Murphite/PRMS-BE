@@ -34,10 +34,10 @@ namespace PRMS.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateNewPatient([FromBody] CreatePatientForPatientDto patientDto)
+        public async Task<IActionResult> CreateNewPatient([FromBody] CreatePatientFromUserDto patientDto)
         {
             var userId = GetUserId();
-            var response = await _patientService.CreatePatientForPatienceAsync(userId, patientDto);
+            var response = await _patientService.CreatePatient(userId, patientDto);
             if (response.IsFailure)
             {
                 return BadRequest(ResponseDto<object>.Failure(response.Errors));

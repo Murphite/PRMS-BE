@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PRMS.Core.Dtos;
 
-public class CreatePatientForAdminDto : BaseCreatePatientDto
+public class CreatePatientFromAdminDto : BaseCreatePatientDto
 {
 	public string? ImageUrl { get; set; }
 

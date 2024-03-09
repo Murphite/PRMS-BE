@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace PRMS.Core.Dtos;
-public class CreatePatientAddressDto
+public class UpdatePatientAddressDto
 {
 	[Required] public string Street { get; set; }
 	[Required] public string City { get; set; }

@@ -59,7 +59,7 @@ public class PatientService : IPatientService
         return Result.Success();
     }
 
-	public async Task<Result> CreatePatientForPatienceAsync(string userId, CreatePatientForPatientDto patientDto)
+	public async Task<Result> CreatePatient(string userId, CreatePatientFromUserDto patientDto)
 	{
 		var existingUser = await _userManager.FindByIdAsync(userId);
         if (existingUser is null)

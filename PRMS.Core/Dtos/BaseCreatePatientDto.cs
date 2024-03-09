@@ -11,7 +11,7 @@ public abstract class BaseCreatePatientDto
 	[Required] public DateOnly DateOfBirth { get; set; }
 	[Required] public Gender Gender { get; set; }
 	[Required] public string PhoneNumber { get; set; }
-	public CreatePatientAddressDto? Address { get; set; }
+	public UpdatePatientAddressDto? Address { get; set; }
 	public ICollection<MedicalDetailsDto> MedicalDetails { get; set; }
 	[Required] public float Height { get; set; }
 	[Required] public float Weight { get; set; }

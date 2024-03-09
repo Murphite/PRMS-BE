@@ -32,14 +32,14 @@ public class AdminPatientController : ControllerBase
     }
 
     [HttpPost("{userId}")]
-    public async Task<IActionResult> CreatePatientFromAdmin([FromBody] CreatePatientForAdminDto patientDto, 
+    public async Task<IActionResult> CreatePatientFromAdmin([FromBody] CreatePatientFromAdminDto patientDto, 
         string userId)
     {
 		if (!ModelState.IsValid)
 		{
 			return BadRequest(ResponseDto<object>.Failure(ModelState.GetErrors()));
 		}
-		var result = await _adminPatientService.CreatePatientFromAdminAsync(patientDto, userId);
+		var result = await _adminPatientService.CreatePatient(patientDto, userId);
 		if (result.IsFailure)
 			return BadRequest(ResponseDto<object>.Failure(result.Errors));
 

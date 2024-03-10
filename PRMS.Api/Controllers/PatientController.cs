@@ -31,17 +31,24 @@ public class PatientController : ControllerBase
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        return Ok(ResponseDto<object>.Success());
-    }
+            return Ok(ResponseDto<object>.Success());
+        }
 
-    [HttpPut]
-    public async Task<IActionResult> UpdateAppointmentStatus([FromBody] AppointmentStatus status)
-    {
-        var patientId = _userManager.GetUserId(User);
-        var result = await _patientService.UpdateAppointmentStatusAsync(patientId!, status);
-        if (result.IsFailure)
-            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+        [HttpPost]
+        public async Task<IActionResult> CreateNewPatient([FromBody] CreatePatientFromUserDto patientDto)
+        {
+            var userId = GetUserId();
+            var response = await _patientService.CreatePatient(userId, patientDto);
+            if (response.IsFailure)
+            {
+                return BadRequest(ResponseDto<object>.Failure(response.Errors));
+            }
+			return Ok(ResponseDto<object>.Success());
+		}
 
-        return Ok(ResponseDto<object>.Success());
-    }
+		private string GetUserId()
+		{
+			return _userManager.GetUserId(User)!;
+		}
+	}
 }

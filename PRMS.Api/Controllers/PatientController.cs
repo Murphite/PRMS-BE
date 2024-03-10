@@ -50,5 +50,5 @@ public class PatientController : ControllerBase
 		{
 			return _userManager.GetUserId(User)!;
 		}
-	}
+	
 }

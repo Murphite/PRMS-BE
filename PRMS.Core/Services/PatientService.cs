@@ -60,7 +60,7 @@ public class PatientService : IPatientService
         return Result.Success();
     }
 
-    public async Task<Result> UpdateAppointmentStatusAsync(string patientId, AppointmentStatus status)
+    public async Task<Result> UpdateAppointmentStatus(string patientId, AppointmentStatus status)
     {
         var user = await _userManager.FindByIdAsync(patientId);
 

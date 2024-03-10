@@ -5,5 +5,5 @@ namespace PRMS.Core.Abstractions;
 
 public interface IPhysicianService
 {
-    public Task<Result<IEnumerable<PhysicianReview>>> GetReviewsAsync(string physicianId);
+    public Task<Result<IEnumerable<PhysicianReview>>> GetReviews(string physicianId);
 }

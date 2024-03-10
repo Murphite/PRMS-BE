@@ -14,7 +14,7 @@ public class PhysicianService : IPhysicianService
         _repository = repository;
     }
 
-    public async Task<Result<IEnumerable<PhysicianReview>>> GetReviewsAsync(string physicianId)
+    public async Task<Result<IEnumerable<PhysicianReview>>> GetReviews(string physicianId)
     {
         var reviews = await _repository.GetAll<PhysicianReview>()
             .Where(review => review.PhysicianId == physicianId)

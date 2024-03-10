@@ -20,7 +20,7 @@ public class PhysicianController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetReviews(string physicianId)
     {
-        var result = await _physicianService.GetReviewsAsync(physicianId);
+        var result = await _physicianService.GetReviews(physicianId);
 
         if (result == null)
         {

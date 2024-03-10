@@ -7,6 +7,6 @@ namespace PRMS.Core.Abstractions
     {
         Task<Result> UpdateFromPatientAsync(UpdatePatientFromPatientDto dto, string userId);
         Task<Result> CreatePatient(string userId, CreatePatientFromUserDto patientDto);
-        Task<Result> UpdateAppointmentStatusAsync(string userId, AppointmentStatus status);
+        Task<Result> UpdateAppointmentStatus(string userId, AppointmentStatus status);
     }
 }

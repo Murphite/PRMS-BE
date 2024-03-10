@@ -32,5 +32,22 @@ namespace PRMS.Api.Controllers
 
             return Ok(ResponseDto<object>.Success());
         }
-    }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateNewPatient([FromBody] CreatePatientFromUserDto patientDto)
+        {
+            var userId = GetUserId();
+            var response = await _patientService.CreatePatient(userId, patientDto);
+            if (response.IsFailure)
+            {
+                return BadRequest(ResponseDto<object>.Failure(response.Errors));
+            }
+			return Ok(ResponseDto<object>.Success());
+		}
+
+		private string GetUserId()
+		{
+			return _userManager.GetUserId(User)!;
+		}
+	}
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
+using PRMS.Core.Dtos;
 
 namespace PRMS.Api.Controllers;
 
@@ -18,9 +19,9 @@ public class PhysicianController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetReviews(string physicianId)
+    public async Task<IActionResult> GetReviews(string physicianId, PaginationFilter paginationFilter)
     {
-        var result = await _physicianService.GetReviews(physicianId);
+        var result = await _physicianService.GetReviews(physicianId, paginationFilter);
 
         if (result == null)
         {

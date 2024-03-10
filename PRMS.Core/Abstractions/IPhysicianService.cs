@@ -5,5 +5,5 @@ namespace PRMS.Core.Abstractions;
 
 public interface IPhysicianService
 {
-    public Task<Result<IEnumerable<PhysicianReview>>> GetReviews(string physicianId);
+    public Task<Result<IEnumerable<PhysicianReviewDto>>> GetReviews(string physicianId, PaginationFilter paginationFilter);
 }

@@ -5,6 +5,7 @@ using PRMS.Core.Abstractions;
 namespace PRMS.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/v1/physicians")]    
 public class PhysicianController : ControllerBase
 {
@@ -28,4 +29,3 @@ public class PhysicianController : ControllerBase
         return Ok(ResponseDto<object>.Success(result.Data));
     }
 }
-

@@ -7,7 +7,7 @@ namespace PRMS.Api.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("api/v1/physicians")]    
+[Route("api/v1/physician")]    
 public class PhysicianController : ControllerBase
 {
     private readonly IPhysicianService _physicianService;
@@ -18,9 +18,9 @@ public class PhysicianController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPhysicianReviews(string physicianId)
+    public async Task<IActionResult> GetReviews(string physicianId)
     {
-        var result = await _physicianService.GetPhysicianReviewsAsync(physicianId);
+        var result = await _physicianService.GetReviewsAsync(physicianId);
 
         if (result == null)
         {

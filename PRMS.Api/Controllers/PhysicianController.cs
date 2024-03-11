@@ -23,11 +23,6 @@ public class PhysicianController : ControllerBase
     {
         var result = await _physicianService.GetReviews(physicianId, paginationFilter);
 
-        if (result == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(ResponseDto<object>.Success(result.Data));
+        return Ok(ResponseDto<object>.Success(result));
     }
 }

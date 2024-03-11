@@ -32,5 +32,18 @@ namespace PRMS.Api.Controllers
 
             return Ok(ResponseDto<object>.Success());
         }
-    }
+
+        [HttpGet("appointments")]
+		public async Task<IActionResult> GetPatientAppointments (string userId, [FromQuery] string? status=null, [FromQuery] PaginationFilter? paginationFilter = null)
+        {
+			paginationFilter ??= new PaginationFilter();
+		    userId=  _userManager.GetUserId(User);
+            var result = await _patientService.GetPatientAppointments(userId, status, paginationFilter);
+            if (result.IsFailure)
+				return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+			return Ok(ResponseDto<object>.Success(result));
+		}
+
+	}
 }

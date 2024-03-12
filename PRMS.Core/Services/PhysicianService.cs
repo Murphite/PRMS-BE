@@ -15,23 +15,22 @@ public class PhysicianService : IPhysicianService
         _repository = repository;
     }
 
-public async Task<PaginatorDto<IEnumerable<PhysicianReviewDto>>> GetReviews(string physicianId, PaginationFilter paginationFilter)
-{
-    var reviews = await _repository.GetAll<PhysicianReview>()
-        .Where(p => p.PhysicianId == physicianId && p.Content != null)
-        .Include(p => p.Patient)
-        .ThenInclude(p => p.User)
-        .OrderByDescending(p => p.CreatedAt)
-        .Select(r => new PhysicianReviewDto
-        {
-            Content = r.Content,
-            Rating = r.Rating,
-            Name = r.Patient.User.FirstName + " " + r.Patient.User.LastName,
-            Image = r.Patient.User.ImageUrl
-        }).Paginate(paginationFilter);
+    public async Task<PaginatorDto<IEnumerable<PhysicianReviewDto>>> GetReviews(string physicianId,
+        PaginationFilter paginationFilter)
+    {
+        var reviews = await _repository.GetAll<PhysicianReview>()
+            .Where(p => p.PhysicianId == physicianId && p.Content != null)
+            .Include(p => p.Patient)
+            .ThenInclude(p => p.User)
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(r => new PhysicianReviewDto
+            {
+                Content = r.Content,
+                Rating = r.Rating,
+                Name = r.Patient.User.FirstName + " " + r.Patient.User.LastName,
+                Image = r.Patient.User.ImageUrl
+            }).Paginate(paginationFilter);
 
-    return reviews;
+        return reviews;
+    }
 }
-
-}
-

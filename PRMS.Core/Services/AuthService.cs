@@ -56,8 +56,8 @@ public class AuthService : IAuthService
 
         await _repository.Add(address);
         var isSaved = await _unitOfWork.SaveChangesAsync() > 0;
-        if(!isSaved)
-            return new Error[] { new("Address.NotSaved", "Address not saved")};
+        if (!isSaved)
+            return new Error[] { new("Address.NotSaved", "Address not saved") };
 
         var result = await _userManager.CreateAsync(user, registerUserDto.Password);
 
@@ -74,10 +74,10 @@ public class AuthService : IAuthService
     public async Task<Result> AdminRegister(AdminRegisterDTO registerAdminDto)
     {
         var emailExist = await _userManager.FindByEmailAsync(registerAdminDto.Email);
-        
+
         if (emailExist != null)
             return new Error[] { new("Registration.Error", "email already exist") };
-        
+
         var user = new User
         {
             FirstName = registerAdminDto.FirstName,
@@ -115,7 +115,7 @@ public class AuthService : IAuthService
         var body =
             @$"Hi {user.FirstName}, Please click the link <a href='{confirmationLink}'>here</a> to confirm your account's email";
         var emailResult = await _emailService.SendEmailAsync(user.Email, "Confirm Email", body);
-        
+
         if (!emailResult)
             return new Error[]
             {
@@ -147,10 +147,11 @@ public class AuthService : IAuthService
     public async Task<Result> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
     {
         var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
-        if(user is null)
+        if (user is null)
             return new Error[] { new("Auth.Error", "No user found with the provided email") };
-        
-        var resetPasswordResult = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
+
+        var resetPasswordResult =
+            await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
 
         if (!resetPasswordResult.Succeeded)
             return resetPasswordResult.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();
@@ -166,14 +167,15 @@ public class AuthService : IAuthService
             return new Error[] { new("Auth.Error", "No user found with the provided email") };
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-        var resetLink = $"{_configuration["ResetPasswordUrl"]}?email={HttpUtility.UrlEncode(user.Email)}&token={HttpUtility.UrlEncode(token)}";
+        var resetLink =
+            $"{_configuration["ResetPasswordUrl"]}?email={HttpUtility.UrlEncode(user.Email)}&token={HttpUtility.UrlEncode(token)}";
 
         const string emailSubject = "Your New Password";
 
         var emailBody = $"Hello {user.FirstName}, click this link to reset your password: {resetLink}.";
 
         var isSuccessful = await _emailService.SendEmailAsync(resetPasswordDto.Email, emailSubject, emailBody);
-        if(!isSuccessful)
+        if (!isSuccessful)
             return new Error[] { new("Auth.Error", "Error occured while sending reset password email") };
 
         return Result.Success();

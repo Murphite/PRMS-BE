@@ -13,7 +13,7 @@ public class CategoryController : ControllerBase
     {
         _categoryService = categoryService;
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetCategories()
     {

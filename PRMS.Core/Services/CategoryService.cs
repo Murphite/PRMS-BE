@@ -13,7 +13,7 @@ public class CategoryService : ICategoryService
     {
         _repository = repository;
     }
-    
+
     public async Task<Result<IEnumerable<CategoryDto>>> GetCategories()
     {
         var categories = await _repository.GetAll<MedicalCenterCategory>()

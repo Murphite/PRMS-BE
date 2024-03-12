@@ -9,4 +9,3 @@ public class PhysicianReviewDto
     public string? Image { get; set; }
     public int Rating { get; set; }
 }
-

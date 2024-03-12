@@ -78,18 +78,19 @@ public class PatientService : IPatientService
 
         appointment.Status = status;
 
-            _repository.Update(appointment);
-            await _unitOfWork.SaveChangesAsync();
-            return Result.Success();
+        _repository.Update(appointment);
+        await _unitOfWork.SaveChangesAsync();
+        return Result.Success();
     }
 
-	public async Task<Result> CreatePatient(string userId, CreatePatientFromUserDto patientDto)
-	{
-		var existingUser = await _userManager.FindByIdAsync(userId);
+    public async Task<Result> CreatePatient(string userId, CreatePatientFromUserDto patientDto)
+    {
+        var existingUser = await _userManager.FindByIdAsync(userId);
         if (existingUser is null)
         {
             return new Error[] { new("User.Error", "User Not Found") };
         }
+
         // Update the user data before creating a new Patient 
         existingUser.FirstName = patientDto.FirstName ?? existingUser.FirstName;
         existingUser.LastName = patientDto.LastName ?? existingUser.LastName;
@@ -119,9 +120,9 @@ public class PatientService : IPatientService
             EmergencyContactPhoneNo = patientDto.EmergencyContactPhoneNo,
             EmergencyContactRelationship = patientDto.EmergencyContactRelationship,
         };
-        
+
         await _repository.Add(newPatient);
         await _unitOfWork.SaveChangesAsync();
         return Result.Success();
-	}
+    }
 }

@@ -8,7 +8,7 @@ namespace PRMS.Api.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("api/v1/physician")]    
+[Route("api/v1/physician")]
 public class PhysicianController : ControllerBase
 {
     private readonly IPhysicianService _physicianService;

@@ -7,23 +7,13 @@ using System.Threading.Tasks;
 
 namespace PRMS.Core.Dtos
 {
-	//public class PatientAppointmentsToReturnDTO
-	//{
- //       public List<AppointmentToReturnDto> UpcomingAppointments { get; set; }
-	//	public List<AppointmentToReturnDto> CompletedAppointments { get; set; }
-	//	public List<AppointmentToReturnDto> CancelledAppointments { get; set; }
- //       public string patientImage {  get; set; }
-
- //   }
-    public record AppointmentToReturnDto(
-        string Name,
+	public record PatientAppointmentsToReturnDTO
+		(
+		string Name,
 		string PhysicianSpeciality,
 		string PhysicianImageUrl,
 		string PhysicianMedicalCenter,
-	    string PhysicianAddress,
+		string PhysicianAddress,
 		DateTimeOffset AppointmentDate
-
-		);
-	
-	
+		);		
 }

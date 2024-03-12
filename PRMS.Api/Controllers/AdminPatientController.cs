@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
+using PRMS.Api.Extensions;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Constants;
@@ -29,4 +30,19 @@ public class AdminPatientController : ControllerBase
 
         return Ok(ResponseDto<object>.Success());
     }
+
+    [HttpPost("{userId}")]
+    public async Task<IActionResult> CreatePatientFromAdmin([FromBody] CreatePatientFromAdminDto patientDto, 
+        string userId)
+    {
+		if (!ModelState.IsValid)
+		{
+			return BadRequest(ResponseDto<object>.Failure(ModelState.GetErrors()));
+		}
+		var result = await _adminPatientService.CreatePatient(patientDto, userId);
+		if (result.IsFailure)
+			return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success());   
+	}
 }

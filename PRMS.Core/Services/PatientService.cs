@@ -64,7 +64,7 @@ public class PatientService : IPatientService
 	}
 	public async Task<Result> GetPatientAppointments(string userId, string? status, PaginationFilter paginationFilter)
 	{
-		var user =  await _userManager.FindByIdAsync(userId);
+		var user = await _userManager.FindByIdAsync(userId);
 		if (user == null)
 			return new Error[] { new("User.Error", "User Not Found") };
 
@@ -77,7 +77,7 @@ public class PatientService : IPatientService
 		.OrderByDescending(c => c.Date)
 		.Include(p => p.Physician)
 		.ThenInclude(u => u.User);
-		
+
 		if (!string.IsNullOrEmpty(status))
 		{
 			switch (status.ToLower())
@@ -92,8 +92,8 @@ public class PatientService : IPatientService
 					patientAppointments = patientAppointments.Where(a => a.Status == AppointmentStatus.Cancelled);
 					break;
 				default:
-					
-					return Result.Success();
+
+					return new Error[] { new("Status.Error", "Invalid status entered") };
 			}
 		}
 

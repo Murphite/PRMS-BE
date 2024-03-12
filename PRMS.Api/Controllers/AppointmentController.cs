@@ -8,7 +8,7 @@ using PRMS.Api.Dtos;
 namespace PRMS.Api.Controllers
 {
     [ApiController]
-    [Route("api/v1/appointments")]
+    [Route("api/v1/appointment")]
     public class AppointmentController : ControllerBase
     {
         private readonly IAppointmentService _appointmentService;
@@ -20,7 +20,7 @@ namespace PRMS.Api.Controllers
             _userManager = userManager;
         }
 
-        [HttpGet("{physicianId}")]
+        [HttpGet("/physician/{physicianId}")]
         public async Task<IActionResult> GetPhysicianAppointments([FromRoute] string physicianId, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
         {
             var userId = _userManager.GetUserId(User);

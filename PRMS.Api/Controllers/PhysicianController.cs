@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
-using PRMS.Core.Dtos;
 
 namespace PRMS.Api.Controllers;
 
@@ -25,5 +24,5 @@ public class PhysicianController : ControllerBase
 
         return Ok(ResponseDto<object>.Success(result));
     }
-
 }
+

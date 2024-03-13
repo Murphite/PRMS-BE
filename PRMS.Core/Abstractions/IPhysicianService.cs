@@ -6,3 +6,4 @@ public interface IPhysicianService
 {
     public Task<IEnumerable<PhysicianDetailsDto>> GetDetails(string physicianId);
 }
+

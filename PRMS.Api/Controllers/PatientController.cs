@@ -46,6 +46,18 @@ public class PatientController : ControllerBase
 
         return Ok(ResponseDto<object>.Success());
     }
+    
+        [HttpGet("appointments")]
+		public async Task<IActionResult> GetPatientAppointments ( [FromQuery] string? status=null, [FromQuery] PaginationFilter? paginationFilter = null)
+        {
+		    paginationFilter ??= new PaginationFilter();
+		    var userId=  _userManager.GetUserId(User);
+            var result = await _patientService.GetPatientAppointments(userId, status, paginationFilter);
+            if (result.IsFailure)
+				return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+			return Ok(ResponseDto<object>.Success(result));
+		}
 
     private string GetUserId()
     {

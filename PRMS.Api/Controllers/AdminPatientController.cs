@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Api.Extensions;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
-using PRMS.Core.Services;
 using PRMS.Domain.Constants;
-using PRMS.Domain.Entities;
 using PRMS.Domain.Enums;
 
 namespace PRMS.Api.Controllers;

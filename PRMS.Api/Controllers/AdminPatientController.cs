@@ -5,6 +5,7 @@ using PRMS.Api.Extensions;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Constants;
+using PRMS.Domain.Enums;
 
 namespace PRMS.Api.Controllers;
 
@@ -18,6 +19,7 @@ public class AdminPatientController : ControllerBase
     public AdminPatientController(IAdminPatientService adminPatientService)
     {
         _adminPatientService = adminPatientService;
+       
     }
 
     [HttpPut("{userId}")]
@@ -41,6 +43,16 @@ public class AdminPatientController : ControllerBase
         }
 
         var result = await _adminPatientService.CreatePatient(patientDto, userId);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success());
+    }
+
+    [HttpPut("{userId}")]
+    public async Task<IActionResult> UpdateAdminAppointmentStatus([FromBody] AppointmentStatus status, [FromRoute] string userId)
+    {
+        var result = await _adminPatientService.UpdateAdminAppointmentStatus(userId, status);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 

@@ -32,14 +32,10 @@ namespace PRMS.Core.Services;
             var physicianAppointments = _repository.GetAll<Appointment>()
                 .Where(p => p.PhysicianId == physician.Id && p.Date >= DateTime.Now && p.Status == AppointmentStatus.Pending)
                 .OrderByDescending(p => p.Date)
-                .Include(p => p.Patient)
-                .ThenInclude(p => p.MedicalDetails)
-                .Include(p => p.Patient)
-                .ThenInclude(p => p.Medications)
-                .Include(p => p.Patient)
-                .ThenInclude(p => p.Prescriptions)
-                .Include(p => p.Patient)
-                .ThenInclude(p => p.User);
+                .Include(p => p.Patient.MedicalDetails)
+                .Include(p => p.Patient.Medications)
+                .Include(p => p.Patient.Prescriptions)
+                .Include(p => p.Patient.User);
 
             var appointmentToReturn = physicianAppointments.Select(p => new PhysicianPatientsAppointmentsDto(
                 $"{p.Patient.User.FirstName} {p.Patient.User.LastName}",
@@ -58,11 +54,6 @@ namespace PRMS.Core.Services;
                     m.Frequency
                     )).ToList()
                 )).Paginate(paginationFilter);
-
-          if (physicianAppointments == null)
-          {
-            return new Error[] { new Error("Appointment.Error", "No Appointment") };
-          }
 
         return Result.Success(appointmentToReturn);
         }

@@ -1,7 +1,7 @@
-﻿using Bogus.DataSets;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
+using PRMS.Core.Utilities;
 using PRMS.Domain.Entities;
 
 namespace PRMS.Core.Services;
@@ -40,5 +40,4 @@ public class PhysicianService : IPhysicianService
         return physician;
     } 
 }
-
 

@@ -1,6 +1,5 @@
 ﻿using PRMS.Core.Abstractions;
 using Microsoft.AspNetCore.Mvc;
-using PRMS.Core.Dtos;
 using Microsoft.AspNetCore.Identity;
 using PRMS.Domain.Entities;
 using PRMS.Api.Dtos;

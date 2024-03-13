@@ -13,11 +13,11 @@ public class CategoryService : ICategoryService
     {
         _repository = repository;
     }
-    
+
     public async Task<Result<IEnumerable<CategoryDto>>> GetCategories()
     {
-        var categories = await _repository.GetAll<MedicalCenter>()
-            .Select(c => new CategoryDto(c.Name, c.ImageUrl!))
+        var categories = await _repository.GetAll<MedicalCenterCategory>()
+            .Select(c => new CategoryDto(c.Id, c.Name, c.ImageUrl!))
             .ToListAsync();
 
         return categories;

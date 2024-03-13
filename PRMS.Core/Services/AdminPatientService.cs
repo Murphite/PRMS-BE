@@ -2,6 +2,7 @@
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Entities;
+using PRMS.Domain.Enums;
 
 namespace PRMS.Core.Services;
 
@@ -56,6 +57,74 @@ public class AdminPatientService : IAdminPatientService
         await _userManager.UpdateAsync(user);
         await _unitOfWork.SaveChangesAsync();
 
+        return Result.Success();
+    }
+
+    public async Task<Result> CreatePatient(CreatePatientFromAdminDto patientDto, string userId)
+    {
+        var existingUser = await _userManager.FindByIdAsync(userId);
+        if (existingUser is null)
+        {
+            return new Error[] { new("User.Error", "User Not Found") };
+        }
+
+        // Update the user data before creating a new Patient 
+        existingUser.FirstName = patientDto.FirstName ?? existingUser.FirstName;
+        existingUser.LastName = patientDto.LastName ?? existingUser.LastName;
+        existingUser.MiddleName = patientDto.MiddleName ?? existingUser.MiddleName;
+        existingUser.PhoneNumber = patientDto.PhoneNumber ?? existingUser.PhoneNumber;
+        existingUser.ImageUrl = patientDto.ImageUrl ?? existingUser.ImageUrl;
+        existingUser.Address.Street = patientDto.Address.Street ?? existingUser.Address.Street;
+        existingUser.Address.City = patientDto.Address.City ?? existingUser.Address.City;
+        existingUser.Address.State = patientDto.Address.State ?? existingUser.Address.State;
+        existingUser.Address.Country = patientDto.Address.Country ?? existingUser.Address.Country;
+
+        await _userManager.UpdateAsync(existingUser);
+
+        var newPatient = new Patient
+        {
+            User = existingUser,
+            DateOfBirth = patientDto.DateOfBirth,
+            Gender = patientDto.Gender,
+            BloodGroup = patientDto.BloodGroup,
+            Medications = (ICollection<Medication>)patientDto.Medications,
+            Height = patientDto.Height,
+            Weight = patientDto.Weight,
+            PrimaryPhysicanEmail = patientDto.PrimaryPhysicanEmail,
+            PrimaryPhysicanName = patientDto.PrimaryPhysicanName,
+            PrimaryPhysicanPhoneNo = patientDto.PrimaryPhysicanPhoneNo,
+            MedicalDetails = (ICollection<MedicalDetail>)patientDto.MedicalDetails,
+            EmergencyContactName = patientDto.EmergencyContactName,
+            EmergencyContactPhoneNo = patientDto.EmergencyContactPhoneNo,
+            EmergencyContactRelationship = patientDto.EmergencyContactRelationship,
+            PhysicianId = patientDto.PhysicianId
+        };
+
+        await _repository.Add(newPatient);
+        await _unitOfWork.SaveChangesAsync();
+        return Result.Success();
+    }
+
+    public async Task<Result> UpdateAdminAppointmentStatus(string userId, AppointmentStatus status)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+        {
+            return new Error[] { new("User.Error", "User Not Found") };
+        }
+
+        var appointment = _repository.GetAll<Appointment>().FirstOrDefault(a => a.PatientId == userId);
+
+        if (appointment == null)
+        {
+            return new Error[] { new Error("Appointment.Error", "No Appointment") };
+        }
+
+        appointment.Status = status;
+
+        _repository.Update(appointment);
+        await _unitOfWork.SaveChangesAsync();
         return Result.Success();
     }
 }

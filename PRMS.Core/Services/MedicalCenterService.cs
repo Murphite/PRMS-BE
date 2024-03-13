@@ -33,24 +33,41 @@ public class MedicalCenterService : IMedicalCenterService
             return new Error[] { new("User.Error", "User Not Found") };
         }
 
-        var medicalCentersQuery = _repository.GetAll<MedicalCenter>()
+        // Query medical centers
+        var medicalCentersQuery = _repository.GetAll<MedicalCenter>();
+
+        // If user's latitude and longitude are available, order by distance
+        if (userLatitude.HasValue && userLongitude.HasValue)
+        {
+            medicalCentersQuery = medicalCentersQuery
+                .Where(mc => mc.Address.Latitude != null && mc.Address.Longitude != null)
+                .OrderBy(mc =>
+                    GeoCalculator.CalculateDistance(userLatitude.Value, userLongitude.Value, mc.Address.Latitude.Value, mc.Address.Longitude.Value));
+        }
+        else
+        {
+            // If user's latitude and longitude are not available, do not order by distance
+            medicalCentersQuery = medicalCentersQuery.OrderBy(mc => mc.Id); // Order by medical center ID
+        }
+
+        // Select medical center DTOs
+        var nearbyMedicalCenters = await medicalCentersQuery
             .Select(mc => new GetMedicalCenterDTO
-            {
+        {
                 Name = mc.Name,
                 ImageUrl = mc.ImageUrl,
                 City = mc.Address.City,
                 State = mc.Address.State,
                 ReviewCount = mc.Reviews.Count(),
                 Rating = (int)Math.Round(mc.Reviews.Average(r => r.Rating)),
-                Distance = userLatitude.HasValue && userLongitude.HasValue
-                    ? GeoCalculator.CalculateDistance(userLatitude.Value, userLongitude.Value, mc.Address.Latitude ?? 0, mc.Address.Longitude ?? 0)
-                    : 0, // Default distance if user's location is not available
+                // Calculate distance using GeoCalculator
+                Distance = GeoCalculator.CalculateDistance(userLatitude ?? 0, userLongitude ?? 0, mc.Address.Latitude ?? 0, mc.Address.Longitude ?? 0),
                 Categories = mc.CategoryPivot.Select(cp => cp.MedicalCenterCategory.Name).ToList()
-            });
+            })
+            .Paginate(paginationFilter);
 
-        var paginatedMedicalCenters = await medicalCentersQuery.Paginate(paginationFilter);
+        return Result.Success(nearbyMedicalCenters);
 
-        return Result.Success(paginatedMedicalCenters);
     }
 
 

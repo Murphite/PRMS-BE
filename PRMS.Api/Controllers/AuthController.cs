@@ -11,8 +11,8 @@ namespace PRMS.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-	
-	public AuthController(IAuthService authService)
+
+    public AuthController(IAuthService authService)
     {
         _authService = authService;
     }
@@ -28,22 +28,23 @@ public class AuthController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
 
-	[HttpPost("admin-register")]
-	public async Task<IActionResult> AdminRegister([FromBody] AdminRegisterDTO registerAdminDto)
-	{
-		if (!ModelState.IsValid)
-		{
-			return BadRequest(ResponseDto<object>.Failure(ModelState.GetErrors()));
-		}
-		var result = await _authService.AdminRegister(registerAdminDto);
+    [HttpPost("admin-register")]
+    public async Task<IActionResult> AdminRegister([FromBody] AdminRegisterDTO registerAdminDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ResponseDto<object>.Failure(ModelState.GetErrors()));
+        }
 
-		if (result.IsFailure)
-			return BadRequest(ResponseDto<object>.Failure(result.Errors));
+        var result = await _authService.AdminRegister(registerAdminDto);
 
-		return Ok(ResponseDto<object>.Success());
-	}
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-	[HttpPost("login")]
+        return Ok(ResponseDto<object>.Success());
+    }
+
+    [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserDto loginUserDto)
     {
         var result = await _authService.Login(loginUserDto);
@@ -75,7 +76,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> ForgotPassword([FromBody] ResetPasswordDto resetPasswordDto)
     {
         var result = await _authService.ForgotPassword(resetPasswordDto);
-        
+
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 

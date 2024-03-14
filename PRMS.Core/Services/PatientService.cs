@@ -110,29 +110,6 @@ public class PatientService : IPatientService
 		return Result.Success(appointmentsToReturn);
 	}
 
-    public async Task<Result> UpdateAppointmentStatus(string userId, AppointmentStatus status)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null)
-        {
-            return new Error[] { new("User.Error", "User Not Found") };
-        }
-
-        var appointment = _repository.GetAll<Appointment>().FirstOrDefault(a => a.PatientId == userId);
-
-        if (appointment == null)
-        {
-            return new Error[] { new Error("Appointment.Error", "No Appointment") };
-        }
-
-        appointment.Status = status;
-
-        _repository.Update(appointment);
-        await _unitOfWork.SaveChangesAsync();
-        return Result.Success();
-    }
-
     public async Task<Result> CreatePatient(string userId, CreatePatientFromUserDto patientDto)
     {
         var existingUser = await _userManager.FindByIdAsync(userId);

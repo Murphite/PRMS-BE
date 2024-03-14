@@ -5,17 +5,20 @@ using PRMS.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using PRMS.Domain.Enums;
 
 namespace PRMS.Core.Services
 {
     public class AppointmentService : IAppointmentService
     {
         private readonly IRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _userManager;
 
-        public AppointmentService(IRepository repository, UserManager<User> userManager)
+        public AppointmentService(IRepository repository, IUnitOfWork unitOfWork, UserManager<User> userManager)
         {
             _repository = repository;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
 
@@ -33,6 +36,29 @@ namespace PRMS.Core.Services
                 .ToListAsync();
 
             return physicianAppointments;
+        }
+
+        public async Task<Result> UpdateAppointmentStatus(string userId, string appointmentId, AppointmentStatus status)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return new Error[] { new("User.Error", "User Not Found") };
+            }
+
+            var appointment = _repository.GetAll<Appointment>().FirstOrDefault(a => a.Id == appointmentId);
+
+            if (appointment == null)
+            {
+                return new Error[] { new("Appointment.Error", "No Appointment") };
+            }
+
+            appointment.Status = status;
+
+            _repository.Update(appointment);
+            await _unitOfWork.SaveChangesAsync();
+            return Result.Success();
         }
     }
 }

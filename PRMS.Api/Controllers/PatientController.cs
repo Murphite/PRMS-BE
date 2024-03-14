@@ -64,15 +64,4 @@ public class PatientController : ControllerBase
     {
         return _userManager.GetUserId(User)!;
     }
-
-    [HttpPut("status")]
-    public async Task<IActionResult> UpdateAppointmentStatus([FromBody] AppointmentStatus status)
-    {
-        var userId = _userManager.GetUserId(User);
-        var result = await _patientService.UpdateAppointmentStatus(userId!, status);
-        if (result.IsFailure)
-            return BadRequest(ResponseDto<object>.Failure(result.Errors));
-
-        return Ok(ResponseDto<object>.Success());
-    }
 }

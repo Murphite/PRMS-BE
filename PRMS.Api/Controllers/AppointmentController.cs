@@ -23,6 +23,7 @@ public class AppointmentController : ControllerBase
         _userManager = userManager;
     }
     
+    [HttpPost]
     public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentDto appointmentDto)
     {
         var userId = _userManager.GetUserId(User);

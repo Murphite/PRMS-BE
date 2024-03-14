@@ -7,7 +7,7 @@ using PRMS.Core.Dtos;
 using PRMS.Domain.Constants;
 using PRMS.Domain.Enums;
 
-namespace PRMS.Api.Controllers;
+namespace PRMS.Api.Controllers.Admin;
 
 [Route("api/v1/admin/patient/{patientUserId}")]
 [Authorize(Roles = RolesConstant.Admin)]

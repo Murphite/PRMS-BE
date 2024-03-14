@@ -1,4 +1,5 @@
-﻿using PRMS.Core.Abstractions;
+﻿using Microsoft.AspNetCore.Authorization;
+using PRMS.Core.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using PRMS.Domain.Entities;
@@ -7,6 +8,7 @@ using PRMS.Api.Dtos;
 namespace PRMS.Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/v1/appointment")]
     public class AppointmentController : ControllerBase
     {

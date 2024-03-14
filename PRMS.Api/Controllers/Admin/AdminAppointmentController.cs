@@ -7,9 +7,9 @@ using PRMS.Core.Dtos;
 using PRMS.Domain.Constants;
 using PRMS.Domain.Entities;
 
-namespace PRMS.Api.Controllers;
+namespace PRMS.Api.Controllers.Admin;
 
-[Route("api/v1/appointment")]
+[Route("api/v1/admin/appointment")]
 [Authorize(Roles = RolesConstant.Admin)]
 [ApiController]
 public class AdminAppointmentController : ControllerBase

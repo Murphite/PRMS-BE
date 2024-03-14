@@ -56,6 +56,7 @@ public class PhysicianService : IPhysicianService
                 MedicalCenterAddress = $"{p.MedicalCenter.Address.Street}, {p.MedicalCenter.Address.City}, {p.MedicalCenter.Address.State}"
             })
             .ToListAsync();
+        
         return physician;
     } 
 }

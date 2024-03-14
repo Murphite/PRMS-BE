@@ -12,7 +12,7 @@ namespace PRMS.Core.Dtos
         public int ReviewCount { get; set; }
         public string Name { get; set; }
         public string Title { get; set; }
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
         public int PatientCount { get; set; }
         public int YearsOfExperience { get; set; }
         public string MedicalCenterName { get; set; }

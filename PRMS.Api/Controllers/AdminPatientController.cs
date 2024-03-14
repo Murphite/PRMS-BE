@@ -9,7 +9,7 @@ using PRMS.Domain.Enums;
 
 namespace PRMS.Api.Controllers;
 
-[Route("api/v1/admin/patient")]
+[Route("api/v1/admin/patient/{userId}")]
 [Authorize(Roles = RolesConstant.Admin)]
 [ApiController]
 public class AdminPatientController : ControllerBase
@@ -22,7 +22,7 @@ public class AdminPatientController : ControllerBase
        
     }
 
-    [HttpPut("{userId}")]
+    [HttpPut]
     public async Task<IActionResult> UpdateFromAdmin([FromBody] UpdatePatientFromAdminDto dto,
         [FromRoute] string userId)
     {
@@ -33,7 +33,7 @@ public class AdminPatientController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
 
-    [HttpPost("{userId}")]
+    [HttpPost]
     public async Task<IActionResult> CreatePatientFromAdmin([FromBody] CreatePatientFromAdminDto patientDto,
         string userId)
     {
@@ -49,7 +49,7 @@ public class AdminPatientController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
 
-    [HttpPut("{userId}")]
+    [HttpPut("appointment/status")]
     public async Task<IActionResult> UpdateAdminAppointmentStatus([FromBody] AppointmentStatus status, [FromRoute] string userId)
     {
         var result = await _adminPatientService.UpdateAdminAppointmentStatus(userId, status);

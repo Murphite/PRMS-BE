@@ -19,13 +19,12 @@ namespace PRMS.Api.Controllers
             _userManager = userManager;
         }
 
-        [HttpGet("/physician/{physicianId}")]
-        public async Task<IActionResult> GetPhysicianAppointments([FromRoute] string physicianId, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
+        [HttpGet("/physician/{physicianUserId}")]
+        public async Task<IActionResult> GetPhysicianAppointments([FromRoute] string physicianUserId, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
         {
-            var userId = _userManager.GetUserId(User);
-            var result = _appointmentService.GetAppointmentsForPhysician(physicianId, startDate, endDate);
-            if (result.Result.IsFailure)
-                return BadRequest(ResponseDto<object>.Failure(result.Result.Errors));
+            var result = await _appointmentService.GetAppointmentsForPhysician(physicianUserId, startDate, endDate);
+            if (result.IsFailure)
+                return BadRequest(ResponseDto<object>.Failure(result.Errors));
             return Ok(ResponseDto<object>.Success());
         }
     }

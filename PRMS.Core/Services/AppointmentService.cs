@@ -60,5 +60,30 @@ namespace PRMS.Core.Services
             await _unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
+
+        public async Task<Result> CreateAppointment(string userId, CreateAppointmentDto appointmentDto)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is null)
+                return new Error[] { new("User.NotFound", "User not found") };
+            
+            var patientId = _repository.GetAll<Patient>().First(p => p.UserId == user.Id).Id;
+            
+            var date = appointmentDto.Date.ToDateTime(appointmentDto.Time);
+            var appointment = new Appointment
+            {
+                Date = date,
+                Status = AppointmentStatus.Pending,
+                PatientId = patientId,
+                PhysicianId = appointmentDto.PhysicianId,
+                Reason = appointmentDto.Reason
+            };
+            
+            await _repository.Add(appointment);
+            await _unitOfWork.SaveChangesAsync();
+            
+            return Result.Success();
+        }
     }
 }

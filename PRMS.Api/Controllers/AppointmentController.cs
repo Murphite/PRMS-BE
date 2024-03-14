@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using PRMS.Domain.Entities;
 using PRMS.Api.Dtos;
+using PRMS.Core.Dtos;
 using PRMS.Domain.Enums;
 
 namespace PRMS.Api.Controllers;
@@ -20,6 +21,15 @@ public class AppointmentController : ControllerBase
     {
         _appointmentService = appointmentService;
         _userManager = userManager;
+    }
+    
+    public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentDto appointmentDto)
+    {
+        var userId = _userManager.GetUserId(User);
+        var result = await _appointmentService.CreateAppointment(userId!, appointmentDto);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+        return Ok(ResponseDto<object>.Success());
     }
 
     [HttpGet("physician/{physicianUserId}")]

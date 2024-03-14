@@ -19,7 +19,7 @@ namespace PRMS.Api.Controllers
             _userManager = userManager;
         }
 
-        [HttpGet("/physician/{physicianUserId}")]
+        [HttpGet("physician/{physicianUserId}")]
         public async Task<IActionResult> GetPhysicianAppointments([FromRoute] string physicianUserId, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
         {
             var result = await _appointmentService.GetAppointmentsForPhysician(physicianUserId, startDate, endDate);

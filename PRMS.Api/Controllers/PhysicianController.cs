@@ -18,11 +18,13 @@ public class PhysicianController : ControllerBase
         _physicianService = physicianService;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetReviews(string physicianId, PaginationFilter paginationFilter)
+    [HttpGet("{physicianId}/reviews")]
+    public async Task<IActionResult> GetReviews([FromRoute] string physicianId, PaginationFilter paginationFilter)
     {
         var result = await _physicianService.GetReviews(physicianId, paginationFilter);
+        if(result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        return Ok(ResponseDto<object>.Success(result));
+        return Ok(ResponseDto<object>.Success(result.Data));
     }
 }

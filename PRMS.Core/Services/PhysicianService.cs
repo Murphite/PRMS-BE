@@ -15,7 +15,7 @@ public class PhysicianService : IPhysicianService
         _repository = repository;
     }
 
-    public async Task<PaginatorDto<IEnumerable<PhysicianReviewDto>>> GetReviews(string physicianId,
+    public async Task<Result<PaginatorDto<IEnumerable<PhysicianReviewDto>>>> GetReviews(string physicianId,
         PaginationFilter paginationFilter)
     {
         var reviews = await _repository.GetAll<PhysicianReview>()
@@ -25,7 +25,7 @@ public class PhysicianService : IPhysicianService
             .OrderByDescending(p => p.CreatedAt)
             .Select(r => new PhysicianReviewDto
             {
-                Content = r.Content,
+                Content = r.Content!,
                 Rating = r.Rating,
                 Name = r.Patient.User.FirstName + " " + r.Patient.User.LastName,
                 Image = r.Patient.User.ImageUrl

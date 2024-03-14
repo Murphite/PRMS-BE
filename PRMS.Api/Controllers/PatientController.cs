@@ -65,7 +65,7 @@ public class PatientController : ControllerBase
         return _userManager.GetUserId(User)!;
     }
 
-    [HttpPut("/status")]
+    [HttpPut("status")]
     public async Task<IActionResult> UpdateAppointmentStatus([FromBody] AppointmentStatus status)
     {
         var userId = _userManager.GetUserId(User);

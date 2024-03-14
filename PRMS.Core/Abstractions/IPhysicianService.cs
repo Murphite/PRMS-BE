@@ -6,4 +6,6 @@ public interface IPhysicianService
 {
     public Task<Result<PaginatorDto<IEnumerable<PhysicianReviewDto>>>> GetReviews(string physicianId,
         PaginationFilter paginationFilter);
+
+    public Task<IEnumerable<PhysicianDetailsDto>> GetDetails(string physicianId);
 }

@@ -15,7 +15,7 @@ public class PhysicianService : IPhysicianService
         _repository = repository;
     }
 
-    public async Task<PaginatorDto<IEnumerable<PhysicianReviewDto>>> GetReviews(string physicianId,
+    public async Task<Result<PaginatorDto<IEnumerable<PhysicianReviewDto>>>> GetReviews(string physicianId,
         PaginationFilter paginationFilter)
     {
         var reviews = await _repository.GetAll<PhysicianReview>()

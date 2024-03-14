@@ -2,6 +2,7 @@
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Entities;
+using PRMS.Domain.Enums;
 
 namespace PRMS.Core.Services;
 
@@ -100,6 +101,29 @@ public class AdminPatientService : IAdminPatientService
         };
 
         await _repository.Add(newPatient);
+        await _unitOfWork.SaveChangesAsync();
+        return Result.Success();
+    }
+
+    public async Task<Result> UpdateAdminAppointmentStatus(string userId, AppointmentStatus status)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+        {
+            return new Error[] { new("User.Error", "User Not Found") };
+        }
+
+        var appointment = _repository.GetAll<Appointment>().FirstOrDefault(a => a.PatientId == userId);
+
+        if (appointment == null)
+        {
+            return new Error[] { new Error("Appointment.Error", "No Appointment") };
+        }
+
+        appointment.Status = status;
+
+        _repository.Update(appointment);
         await _unitOfWork.SaveChangesAsync();
         return Result.Success();
     }

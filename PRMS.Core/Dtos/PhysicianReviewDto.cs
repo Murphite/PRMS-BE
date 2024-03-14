@@ -1,6 +1,4 @@
-﻿using PRMS.Domain.Entities;
-
-namespace PRMS.Core.Dtos;
+﻿namespace PRMS.Core.Dtos;
 
 public class PhysicianReviewDto
 {

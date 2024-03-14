@@ -30,7 +30,7 @@ public class AppointmentController : ControllerBase
         var result = await _appointmentService.CreateAppointment(userId!, appointmentDto);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
-        return Ok(ResponseDto<object>.Success());
+        return Ok(ResponseDto<object>.Success("Appointment created successfully!"));
     }
 
     [HttpGet("physician/{physicianUserId}")]

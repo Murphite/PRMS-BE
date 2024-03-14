@@ -73,11 +73,13 @@ namespace PRMS.Core.Services
             var date = appointmentDto.Date.ToDateTime(appointmentDto.Time);
             var appointment = new Appointment
             {
-                Date = date,
+                Date = new DateTimeOffset(date).ToUniversalTime(),
                 Status = AppointmentStatus.Pending,
                 PatientId = patientId,
                 PhysicianId = appointmentDto.PhysicianId,
-                Reason = appointmentDto.Reason
+                Reason = appointmentDto.Reason,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
             };
             
             await _repository.Add(appointment);

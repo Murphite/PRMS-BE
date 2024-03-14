@@ -93,4 +93,18 @@ public class AuthController : ControllerBase
 
         return Ok(ResponseDto<object>.Success());
     }
+
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ResponseDto<object>.Failure(ModelState.GetErrors()));
+        }
+        var changePasswordResult = await _authService.ChangePasswordAsync(changePasswordDto);
+        if (changePasswordResult.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(changePasswordResult.Errors));
+
+        return Ok(ResponseDto<object>.Success(changePasswordResult));
+    }
 }

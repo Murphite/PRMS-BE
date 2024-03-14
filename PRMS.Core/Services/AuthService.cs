@@ -206,4 +206,25 @@ public class AuthService : IAuthService
 
         return Result.Success();
     }
+
+    public async Task<Result> ChangePasswordAsync(ChangePasswordDto model)
+    {
+        var user = await _userManager.FindByEmailAsync(model.Email);
+
+        if (user == null)
+            return new Error[] { new("Auth.Error", "email not correct") };
+
+        if (!await _userManager.CheckPasswordAsync(user, model.OldPassword))
+            return new Error[] { new("Auth.Error", "password not correct") };
+
+        if (model.NewPassword != model.ConfirmPassword)
+            return new Error[] { new("Auth.Error", "Newpassword and Confirmpassword must match") };
+
+        var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+        if (!result.Succeeded)
+            return result.Errors.Select(error => new Error(error.Code, error.Description)).ToArray();
+
+        return Result.Success();
+
+    }
 }

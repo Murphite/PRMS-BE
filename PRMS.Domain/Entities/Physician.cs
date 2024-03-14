@@ -10,8 +10,9 @@ public class Physician : Entity, IAuditable
     public string WorkingTime { get; set; }
     public int YearsOfExperience { get; set; }
 
-    public DateTimeOffset CreatedAt { get; }
-    public DateTimeOffset UpdatedAt { get; }
+    
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 
     public User User { get; set; }
     public MedicalCenter MedicalCenter { get; set; }

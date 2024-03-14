@@ -150,17 +150,30 @@ public class PatientService : IPatientService
             DateOfBirth = patientDto.DateOfBirth,
             Gender = patientDto.Gender,
             BloodGroup = patientDto.BloodGroup,
-            Medications = (ICollection<Medication>)patientDto.Medications,
             Height = patientDto.Height,
             Weight = patientDto.Weight,
             PrimaryPhysicanEmail = patientDto.PrimaryPhysicanEmail,
             PrimaryPhysicanName = patientDto.PrimaryPhysicanName,
             PrimaryPhysicanPhoneNo = patientDto.PrimaryPhysicanPhoneNo,
-            MedicalDetails = (ICollection<MedicalDetail>)patientDto.MedicalDetails,
             EmergencyContactName = patientDto.EmergencyContactName,
             EmergencyContactPhoneNo = patientDto.EmergencyContactPhoneNo,
             EmergencyContactRelationship = patientDto.EmergencyContactRelationship,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow,
         };
+
+        // newPatient.Medications = patientDto.Medications.Select(x => new Medication
+        // {
+        //     PatientId = newPatient.Id,
+        //     Name = x.Name,
+        //     Dosage = x.Dosage,
+        //     Frequency = x.Frequency,
+        // }).ToList();
+        // newPatient.MedicalDetails = patientDto.MedicalDetails.Select(x => new MedicalDetail
+        // {
+        //     MedicalDetailsType = x.MedicalDetailsType,
+        //     Value = x.Value
+        // }).ToList();
 
         await _repository.Add(newPatient);
         await _unitOfWork.SaveChangesAsync();

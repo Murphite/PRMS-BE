@@ -17,8 +17,8 @@ public class Patient: Entity, IAuditable
     public string EmergencyContactPhoneNo { get; set; }
     public float Height { get; set; }
     public float Weight { get; set; }
-    public DateTimeOffset CreatedAt { get; }
-    public DateTimeOffset UpdatedAt { get; }
+    public DateTimeOffset CreatedAt { get; set; } 
+    public DateTimeOffset UpdatedAt { get; set; }
     
     public User User { get; set; }
     public Physician? Physician { get; set; }

@@ -22,9 +22,9 @@ public class Patient: Entity, IAuditable
     
     public User User { get; set; }
     public Physician? Physician { get; set; }
-    public ICollection<Medication> Medications { get; set; }
-    public ICollection<Prescription> Prescriptions { get; set; }
-    public ICollection<MedicalDetail> MedicalDetails { get; set; }
-    public ICollection<Appointment> Appointments { get; set; }
-    public ICollection<Favorite> Favorites { get; set; }
+    public ICollection<Medication> Medications { get; set; }  = new List<Medication>();
+    public ICollection<Prescription> Prescriptions { get; set; } = new List<Prescription>();
+    public ICollection<MedicalDetail> MedicalDetails { get; set; } = new  List<MedicalDetail>();
+    public ICollection<Appointment> Appointments { get; set; } = new  List<Appointment>();
+    public ICollection<Favorite> Favorites { get; set; } = new  List<Favorite>();
 }

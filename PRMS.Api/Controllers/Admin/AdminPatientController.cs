@@ -10,7 +10,7 @@ using PRMS.Domain.Enums;
 namespace PRMS.Api.Controllers.Admin;
 
 [Route("api/v1/admin/patient/{patientUserId}")]
-[Authorize(Roles = RolesConstant.Admin)]
+// [Authorize(Roles = RolesConstant.Admin)]
 [ApiController]
 public class AdminPatientController : ControllerBase
 {
@@ -20,6 +20,16 @@ public class AdminPatientController : ControllerBase
     {
         _adminPatientService = adminPatientService;
        
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetPatientDetails([FromRoute] string patientUserId)
+    {
+        var result = await _adminPatientService.GetPatientDetailsAsync(patientUserId);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<PatientDetailsDto>.Success(result.Data));
     }
 
     [HttpPut]

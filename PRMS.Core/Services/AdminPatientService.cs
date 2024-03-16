@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Entities;
@@ -17,6 +18,62 @@ public class AdminPatientService : IAdminPatientService
         _repository = repository;
         _userManager = userManager;
         _unitOfWork = unitOfWork;
+    }
+
+    public async Task<Result<PatientDetailsDto>> GetPatientDetailsAsync(string patientId)
+    {
+        var patients = _repository.GetAll<Patient>()
+            .Where(p => p.Id == patientId);
+
+        var patientDetails = await patients
+            .Include(p => p.User)
+            .Include(p => p.Medications)
+            .Include(p => p.MedicalDetails)
+            .Select(p => new PatientDetailsDto
+            {
+                FullName = $"{p.User.FirstName} {p.User.LastName}",
+                Email = p.User.Email!,
+                Phone = p.User.PhoneNumber,
+                Image = p.User.ImageUrl,
+                Dob = p.DateOfBirth.ToString(),
+                Gender = p.Gender.ToString(),
+                BloodGroup = p.BloodGroup.ToString(),
+                Height = p.Height,
+                Weight = p.Weight,
+                PrimaryCarePhysican = p.PrimaryPhysicanName,
+            })
+            .FirstOrDefaultAsync();
+
+        if (patientDetails is null)
+            return new Error[] { new("Patient.Error", "Patient Not Found") };
+
+        var latestAppointment = await _repository.GetAll<Appointment>()
+            .Include(a => a.Physician)
+            .ThenInclude(p => p.MedicalCenter)
+            .Where(a => a.PatientId == patientId)
+            .OrderByDescending(a => a.Date)
+            .FirstOrDefaultAsync();
+
+        if (latestAppointment is not null)
+        {
+            patientDetails.PhysicianName = latestAppointment.Physician.User.FirstName + " " +
+                                           latestAppointment.Physician.User.LastName;
+            patientDetails.Location = latestAppointment.Physician.MedicalCenter.Address.ToString();
+            patientDetails.AppointmentStartTime = latestAppointment.Date.TimeOfDay.ToString();
+            patientDetails.AppointmentEndTime = latestAppointment.Date.AddMinutes(30).TimeOfDay.ToString();
+            patientDetails.NoOfVisits = await patients.Select(p => p.Appointments.Count).FirstOrDefaultAsync();
+        }
+
+
+        patientDetails.CurrentMedications = string.Join(", ", patients.First().Medications.Select(m => m.Name));
+        patientDetails.Allergies = string.Join(", ",
+            patients.First().MedicalDetails.Where(md => md.MedicalDetailsType == MedicalDetailsType.Allergy)
+                .Select(md => md.Value));
+        patientDetails.MedicalConditions = string.Join(", ",
+            patients.First().MedicalDetails.Where(md => md.MedicalDetailsType == MedicalDetailsType.MedicalCondition)
+                .Select(md => md.Value));
+
+        return patientDetails;
     }
 
     public async Task<Result> UpdateFromAdminAsync(UpdatePatientFromAdminDto dto, string userId)

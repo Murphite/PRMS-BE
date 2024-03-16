@@ -52,4 +52,13 @@ public class AppointmentController : ControllerBase
 
         return Ok(ResponseDto<object>.Success());
     }
+    [HttpPut("{appointmentId}/reschedule")]
+    public async Task<IActionResult> RescheduleAppointment([FromRoute] string appointmentId, [FromBody] RescheduleAppointmentDto rescheduleDto)
+    {
+        var userId = _userManager.GetUserId(User);
+        var result = await _appointmentService.RescheduleAppointment(userId, appointmentId, rescheduleDto);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+        return Ok(ResponseDto<object>.Success());
+    }
 }

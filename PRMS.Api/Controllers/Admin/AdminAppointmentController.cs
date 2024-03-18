@@ -35,4 +35,16 @@ public class AdminAppointmentController : ControllerBase
 
         return Ok(ResponseDto<object>.Success());
     }
+    [HttpGet]
+    public async Task<IActionResult> GetAllPhysicianRangedAppointments([FromBody] DateTimeOffset startDate, [FromBody] DateTimeOffset endDate, PaginationFilter? paginationFilter = null)
+    {
+        paginationFilter ??= new PaginationFilter();
+        var physicianUserId = _userManager.GetUserId(User);
+        var result = await _adminAppointmentService.GetAllPhysicianRangedAppointments(physicianUserId!, paginationFilter, startDate, endDate);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success());
+    }
+
 }

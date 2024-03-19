@@ -34,29 +34,21 @@ public class PhysicianService : IPhysicianService
         return reviews;
     }
     
-    public async Task<IEnumerable<PhysicianDetailsDto>> GetDetails(string physicianId)
+    public async Task<Result<PhysicianDetailsDto>> GetDetails(string physicianId)
     {
+        var result = await _repository.GetAll<Physician>()
+            .Where(p => p.Id == physicianId).ToListAsync();
+        
         var physician = await _repository.GetAll<Physician>()
             .Where(p => p.Id == physicianId)
             .Include(p => p.User)
             .Include(p => p.MedicalCenter)
             .Include(p => p.Reviews)
-            .Select(p => new PhysicianDetailsDto
-            {
-                Name = $"{p.Title} {p.User.FirstName} {p.User.LastName}",
-                Speciality = p.Speciality,
-                About = p.About,
-                WorkingTime = p.WorkingTime,
-                YearsOfExperience = p.YearsOfExperience,
-                AverageRating = p.Reviews.Average(r => r.Rating),
-                ReviewCount = p.Reviews.Count(),
-                PatientCount = p.Patients.Count(),
-                ImageUrl = p.User.ImageUrl,
-                MedicalCenterName = p.MedicalCenter.Name,
-                MedicalCenterAddress = $"{p.MedicalCenter.Address.Street}, {p.MedicalCenter.Address.City}, {p.MedicalCenter.Address.State}"
-            })
-            .ToListAsync();
-        
-        return physician;
+            .FirstOrDefaultAsync();
+
+        if (physician is null)
+            return new Error[] { new("Physician.NotFound", "Physician not found") };
+
+        return new PhysicianDetailsDto();
     } 
 }

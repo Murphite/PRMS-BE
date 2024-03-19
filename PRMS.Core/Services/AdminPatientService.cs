@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
+using PRMS.Core.Utilities;
 using PRMS.Domain.Entities;
 using PRMS.Domain.Enums;
 
@@ -20,10 +21,15 @@ public class AdminPatientService : IAdminPatientService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<PatientDetailsDto>> GetPatientDetailsAsync(string patientId)
+    public async Task<Result<PatientDetailsDto>> GetPatientDetails(string patientUserId)
     {
+        var user = await _userManager.FindByIdAsync(patientUserId);
+        
+        if(user is null) 
+            return new Error[] {new("User.Error", "User Not Found")};
+        
         var patients = _repository.GetAll<Patient>()
-            .Where(p => p.Id == patientId);
+            .Where(p => p.UserId == patientUserId);
 
         var patientDetails = await patients
             .Include(p => p.User)
@@ -50,7 +56,7 @@ public class AdminPatientService : IAdminPatientService
         var latestAppointment = await _repository.GetAll<Appointment>()
             .Include(a => a.Physician)
             .ThenInclude(p => p.MedicalCenter)
-            .Where(a => a.PatientId == patientId)
+            .Where(a => a.PatientId == patientUserId)
             .OrderByDescending(a => a.Date)
             .FirstOrDefaultAsync();
 
@@ -64,7 +70,6 @@ public class AdminPatientService : IAdminPatientService
             patientDetails.NoOfVisits = await patients.Select(p => p.Appointments.Count).FirstOrDefaultAsync();
         }
 
-
         patientDetails.CurrentMedications = string.Join(", ", patients.First().Medications.Select(m => m.Name));
         patientDetails.Allergies = string.Join(", ",
             patients.First().MedicalDetails.Where(md => md.MedicalDetailsType == MedicalDetailsType.Allergy)
@@ -74,6 +79,22 @@ public class AdminPatientService : IAdminPatientService
                 .Select(md => md.Value));
 
         return patientDetails;
+    }
+
+    public async Task<Result<PaginatorDto<IEnumerable<PatientDto>>>> GetListOfPatients(PaginationFilter paginationFilter)
+    {
+        var patients = await _repository.GetAll<Patient>()
+            .Select(patient => new PatientDto
+            {
+                PatientId = patient.Id,
+                PatientName = $"{patient.User.FirstName} {patient.User.LastName}",
+                ImageUrl = patient.User.ImageUrl,
+                DateCreated = patient.CreatedAt,
+                NoOfAppointments = patient.Appointments.Count()
+            })
+            .Paginate(paginationFilter);
+
+        return patients;
     }
 
     public async Task<Result> UpdateFromAdminAsync(UpdatePatientFromAdminDto dto, string userId)

@@ -79,5 +79,6 @@ public static class ServiceRegistration
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddScoped<IPhysicianService, PhysicianService>();
+        services.AddScoped<IPrescriptionService, PrescriptionService>();
     }
 }

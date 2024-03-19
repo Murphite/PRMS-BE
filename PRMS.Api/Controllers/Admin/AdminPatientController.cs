@@ -9,7 +9,7 @@ using PRMS.Domain.Enums;
 
 namespace PRMS.Api.Controllers.Admin;
 
-[Route("api/v1/admin/patient/{patientUserId}")]
+[Route("api/v1/admin/patient")]
 // [Authorize(Roles = RolesConstant.Admin)]
 [ApiController]
 public class AdminPatientController : ControllerBase
@@ -23,16 +23,26 @@ public class AdminPatientController : ControllerBase
     }
     
     [HttpGet]
+    public async Task<IActionResult> GetPatientList([FromRoute] string patientUserId)
+    {
+        var result = await _adminPatientService.GetPatientDetails(patientUserId);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<PatientDetailsDto>.Success(result.Data));
+    }
+    
+    [HttpGet("{patientUserId}")]
     public async Task<IActionResult> GetPatientDetails([FromRoute] string patientUserId)
     {
-        var result = await _adminPatientService.GetPatientDetailsAsync(patientUserId);
+        var result = await _adminPatientService.GetPatientDetails(patientUserId);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
         return Ok(ResponseDto<PatientDetailsDto>.Success(result.Data));
     }
 
-    [HttpPut]
+    [HttpPut("{patientUserId}")]
     public async Task<IActionResult> UpdateFromAdmin([FromBody] UpdatePatientFromAdminDto dto,
         [FromRoute] string patientUserId)
     {
@@ -43,7 +53,7 @@ public class AdminPatientController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
 
-    [HttpPost]
+    [HttpPost("{patientUserId}")]
     public async Task<IActionResult> CreatePatientFromAdmin([FromBody] CreatePatientFromAdminDto patientDto,
         string patientUserId)
     {

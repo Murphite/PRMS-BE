@@ -56,7 +56,7 @@ public class AppointmentController : ControllerBase
     public async Task<IActionResult> RescheduleAppointment([FromRoute] string appointmentId, [FromBody] RescheduleAppointmentDto rescheduleDto)
     {
         var userId = _userManager.GetUserId(User);
-        var result = await _appointmentService.RescheduleAppointment(userId, appointmentId, rescheduleDto);
+        var result = await _appointmentService.RescheduleAppointment(appointmentId, rescheduleDto);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
         return Ok(ResponseDto<object>.Success());

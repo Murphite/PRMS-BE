@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using PRMS.Domain.Enums;
 
 namespace PRMS.Core.Services
-{
+{ 
     public class AppointmentService : IAppointmentService
     {
         private readonly IRepository _repository;
@@ -88,15 +88,8 @@ namespace PRMS.Core.Services
             return Result.Success();
         }
 
-        public async Task<Result> RescheduleAppointment(string userId, string appointmentId, RescheduleAppointmentDto rescheduleDto)
+        public async Task<Result> RescheduleAppointment(string appointmentId, RescheduleAppointmentDto rescheduleDto)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-
-            if (user == null)
-            {
-                return new Error[] { new("User.Error", "User Not Found") };
-            }
-
             var appointment = _repository.GetAll<Appointment>().FirstOrDefault(a => a.Id == appointmentId);
 
             if (appointment == null)
@@ -111,5 +104,6 @@ namespace PRMS.Core.Services
 
             return Result.Success();
         }
+
     }
 }

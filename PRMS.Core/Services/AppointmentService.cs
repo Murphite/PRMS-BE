@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using PRMS.Domain.Enums;
 
 namespace PRMS.Core.Services
-{
+{ 
     public class AppointmentService : IAppointmentService
     {
         private readonly IRepository _repository;
@@ -67,9 +67,9 @@ namespace PRMS.Core.Services
 
             if (user is null)
                 return new Error[] { new("User.NotFound", "User not found") };
-            
+
             var patientId = _repository.GetAll<Patient>().First(p => p.UserId == user.Id).Id;
-            
+
             var date = appointmentDto.Date.ToDateTime(appointmentDto.Time);
             var appointment = new Appointment
             {
@@ -81,11 +81,29 @@ namespace PRMS.Core.Services
                 CreatedAt = DateTimeOffset.UtcNow,
                 UpdatedAt = DateTimeOffset.UtcNow
             };
-            
+
             await _repository.Add(appointment);
             await _unitOfWork.SaveChangesAsync();
-            
+
             return Result.Success();
         }
+
+        public async Task<Result> RescheduleAppointment(string appointmentId, RescheduleAppointmentDto rescheduleDto)
+        {
+            var appointment = _repository.GetAll<Appointment>().FirstOrDefault(a => a.Id == appointmentId);
+
+            if (appointment == null)
+            {
+                return new Error[] { new("Appointment.Error", "No Appointment") };
+            }
+
+            appointment.Date = rescheduleDto.NewAppointmentDate;
+
+            _repository.Update(appointment);
+            await _unitOfWork.SaveChangesAsync();
+
+            return Result.Success();
+        }
+
     }
 }

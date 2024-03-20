@@ -35,4 +35,17 @@ public class AdminAppointmentController : ControllerBase
 
         return Ok(ResponseDto<object>.Success());
     }
+    [HttpGet]
+    public async Task<IActionResult> GetAllPhysicianRangedAppointments()
+    {
+        var physicianUserId = _userManager.GetUserId(User);
+        var result = await _adminAppointmentService.GetAllPhysicianRangedAppointments(physicianUserId!);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success());
+    }
+
+
+
 }

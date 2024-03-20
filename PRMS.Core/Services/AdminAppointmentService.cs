@@ -19,14 +19,14 @@ public class AdminAppointmentService : IAdminAppointmentService
         _repository = repository;
     }
 
-    public async Task<Result> GetAllPhysicianRangedAppointments(string physicianUserId, PaginationFilter paginationFilter, DateTimeOffset startDate, DateTimeOffset endDate)
+    public async Task<Result> GetAllPhysicianRangedAppointments(string physicianUserId, DateTimeOffset startDate, DateTimeOffset endDate)
     {
         var physician = await _userManager.FindByIdAsync(physicianUserId);
         if (physician == null)
         {
             return new Error[] { new("User.Error", "This physician is not registered") };
         }
-        var appointments = await _repository.GetAll<Appointment>()
+        var appointments = _repository.GetAll<Appointment>()
             .Where(c => c.PhysicianId == physicianUserId && c.Date >= startDate && c.Date <= endDate)
             .Include(c => c.Patient)
             .OrderByDescending(c => c.Date)
@@ -36,7 +36,7 @@ public class AdminAppointmentService : IAdminAppointmentService
                 LastName = r.Patient.User.LastName,
                 ImageUrl = r.Patient.User.ImageUrl,
                 Date = r.Date
-            }).Paginate(paginationFilter);
+            });
         return Result.Success(appointments);
     }
 

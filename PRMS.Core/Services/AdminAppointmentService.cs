@@ -26,8 +26,13 @@ public class AdminAppointmentService : IAdminAppointmentService
         {
             return new Error[] { new("User.Error", "This physician is not registered") };
         }
+        DateTime currentDate = DateTime.Today;
+
+        DateTime firstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1); //first day of the current month             
+
+        DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1); //last day of the current month
         var appointments = _repository.GetAll<Appointment>()
-            .Where(c => c.PhysicianId == physicianUserId && c.Date >= DateTime.Now.AddDays(-28) && c.Date <= DateTime.Now.AddDays(28))
+            .Where(c => c.PhysicianId == physicianUserId && c.Date >= firstDayOfMonth && c.Date <= lastDayOfMonth)
             .Include(c => c.Patient)
             .OrderByDescending(c => c.Date)
             .Select(r => new PhysicianRangedAppointmentDto

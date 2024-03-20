@@ -19,7 +19,7 @@ public class AdminAppointmentService : IAdminAppointmentService
         _repository = repository;
     }
 
-    public async Task<Result> GetAllPhysicianRangedAppointments(string physicianUserId, DateTimeOffset startDate, DateTimeOffset endDate)
+    public async Task<Result> GetAllPhysicianRangedAppointments(string physicianUserId)
     {
         var physician = await _userManager.FindByIdAsync(physicianUserId);
         if (physician == null)
@@ -27,7 +27,7 @@ public class AdminAppointmentService : IAdminAppointmentService
             return new Error[] { new("User.Error", "This physician is not registered") };
         }
         var appointments = _repository.GetAll<Appointment>()
-            .Where(c => c.PhysicianId == physicianUserId && c.Date >= startDate && c.Date <= endDate)
+            .Where(c => c.PhysicianId == physicianUserId && c.Date >= DateTime.Now.AddDays(-28) && c.Date <= DateTime.Now.AddDays(28))
             .Include(c => c.Patient)
             .OrderByDescending(c => c.Date)
             .Select(r => new PhysicianRangedAppointmentDto

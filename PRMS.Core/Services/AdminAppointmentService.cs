@@ -19,6 +19,32 @@ public class AdminAppointmentService : IAdminAppointmentService
         _repository = repository;
     }
 
+    public async Task<Result> GetAllPhysicianRangedAppointments(string physicianUserId)
+    {
+        var physician = await _userManager.FindByIdAsync(physicianUserId);
+        if (physician == null)
+        {
+            return new Error[] { new("User.Error", "This physician is not registered") };
+        }
+        DateTime currentDate = DateTime.Today;
+
+        DateTime firstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1); //first day of the current month             
+
+        DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1); //last day of the current month
+        var appointments = _repository.GetAll<Appointment>()
+            .Where(c => c.PhysicianId == physicianUserId && c.Date >= firstDayOfMonth && c.Date <= lastDayOfMonth)
+            .Include(c => c.Patient)
+            .OrderByDescending(c => c.Date)
+            .Select(r => new PhysicianRangedAppointmentDto
+            {
+                FirstName = r.Patient.User.FirstName,
+                LastName = r.Patient.User.LastName,
+                ImageUrl = r.Patient.User.ImageUrl,
+                Date = r.Date
+            });
+        return Result.Success(appointments);
+    }
+
     public async Task<Result> GetPatientAppointments(string physicianUserId, string? status,
         PaginationFilter paginationFilter)
     {

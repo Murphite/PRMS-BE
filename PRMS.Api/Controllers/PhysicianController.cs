@@ -23,20 +23,19 @@ public class PhysicianController : Controller
     [HttpGet]
     public async Task<IActionResult> GetAllMedicalPhysicians([FromQuery] PaginationFilter paginationFilter)
     {
-        var user = await signInManager.UserManager.GetUserAsync(User);
-
-        // Call the service method to retrieve all medical Physicans with pagination
-        var result = await _PhysicanService.GetAll(user.Id, paginationFilter);
+        // Call the service method to retrieve all medical Physicians with pagination
+        var result = await _PhysicanService.GetAll(paginationFilter);
 
         // Check if the operation was successful
         if (result.IsSuccess)
         {
-            // Return the paginated list of medical Physicans
+            // Return the paginated list of medical Physicians
             return Ok(result.Data);
         }
 
         // Return error response if the operation failed
         return BadRequest(new { ErrorMessage = result.Errors });
     }
+
 
 }

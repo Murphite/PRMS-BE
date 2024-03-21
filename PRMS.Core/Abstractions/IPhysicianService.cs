@@ -9,6 +9,6 @@ namespace PRMS.Core.Abstractions
 {
     public interface IPhysicianService
     {
-        Task<Result<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>> GetAll(string userId, PaginationFilter paginationFilter);
+        Task<Result<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>> GetAll(PaginationFilter paginationFilter);
     }
 }

@@ -23,16 +23,8 @@ public class PhysicianService : IPhysicianService
         _userManager = userManager;
     }
 
-    public async Task<Result<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>> GetAll(string userId, PaginationFilter paginationFilter)
+    public async Task<Result<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>> GetAll(PaginationFilter paginationFilter)
     {
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null)
-        {
-            //return Result.Failure(new[] { new Error("User.Error", "User Not Found") }); this one does not work because the Failure method expects an IEnumerable<Error> as its parameter. 
-            //return Result.Failure<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>(new[] { new Error("User.Error", "User Not Found") });
-            return new Error[] { new("User.Error", "User Not Found") };
-        }
-
         var physicansQuery = _repository.GetAll<Physician>()
             .Select(ms => new GetPhysiciansDTO
             {
@@ -46,8 +38,8 @@ public class PhysicianService : IPhysicianService
                 City = ms.User.Address.City,
                 State = ms.User.Address.State,
                 MedicalCenterName = ms.MedicalCenter.Name,
-                ReviewCount = ms.Reviews.Count(), // No need for null check here
-                Rating = (int)Math.Round(ms.Reviews.Average(r => r.Rating)) // No need for null check here
+                ReviewCount = ms.Reviews.Count(),
+                Rating = (int)Math.Round(ms.Reviews.Average(r => r.Rating))
             });
 
         var paginatedPhysicans = await physicansQuery.Paginate(paginationFilter);

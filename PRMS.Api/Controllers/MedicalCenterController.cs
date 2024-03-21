@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
@@ -23,17 +24,11 @@ public class MedicalCenterController : Controller
 
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAllMedicalCenters([FromQuery] PaginationFilter paginationFilter)
     {
         // Get the current user
         var user = await signInManager.UserManager.GetUserAsync(User);
-
-        // Check if the user object is null
-        if (user == null)
-        {
-            // Return unauthorized response if the user is not authenticated
-            return Unauthorized();
-        }
 
         // Get the user's longitude and latitude
         double? userLongitude = user.Address?.Longitude;
@@ -52,4 +47,5 @@ public class MedicalCenterController : Controller
         // Return error response if the operation failed
         return BadRequest(new { ErrorMessage = result.Errors });
     }
+
 }

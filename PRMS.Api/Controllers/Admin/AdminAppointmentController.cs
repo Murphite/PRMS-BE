@@ -23,8 +23,8 @@ public class AdminAppointmentController : ControllerBase
         _userManager = userManager;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetPatientAppointments([FromQuery] string? status = null, PaginationFilter? paginationFilter = null)
+	[HttpGet("patient-appointment")]
+	public async Task<IActionResult> GetPatientAppointments([FromQuery] string? status = null, PaginationFilter? paginationFilter = null)
     {
         paginationFilter ??= new PaginationFilter();
         var physicianUserId = _userManager.GetUserId(User);
@@ -35,8 +35,8 @@ public class AdminAppointmentController : ControllerBase
 
         return Ok(ResponseDto<object>.Success());
     }
-    [HttpGet]
-    public async Task<IActionResult> GetAllPhysicianRangedAppointments()
+    [HttpGet("physician-ranged-appointments")]
+	public async Task<IActionResult> GetAllPhysicianRangedAppointments()
     {
         var physicianUserId = _userManager.GetUserId(User);
         var result = await _adminAppointmentService.GetAllPhysicianRangedAppointments(physicianUserId!);

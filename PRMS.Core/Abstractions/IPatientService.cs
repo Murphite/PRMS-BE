@@ -8,10 +8,10 @@ public interface IPatientService
     public Task<Result> GetPatientAppointments(string userId, string? status, PaginationFilter paginationFilter);
     Task<Result> UpdateFromPatientAsync(UpdatePatientFromPatientDto dto, string userId);
     Task<Result> CreatePatient(string userId, CreatePatientFromUserDto patientDto);
-    public Task<Result<Integer>> GetNewPatientsCount(DateTime startDate, DateTime endDate);
+    public Task<Result<Integer>> GetNewPatientsCount();
 }
 
 public class Integer
 {
-    public int data { get; set; }
+    public int Data { get; set; }
 }

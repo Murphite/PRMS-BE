@@ -180,21 +180,19 @@ public class PatientService : IPatientService
         return Result.Success();
     }
 
-    public async Task<Result<Integer>> GetNewPatientsCount(DateTime startDate, DateTime endDate)
+    public async Task<Result<Integer>> GetNewPatientsCount()
     {
-        try
-        {
-            var newPatientsCount = await _repository
-                .GetAll<Patient>()
-                .CountAsync(p => p.CreatedAt >= startDate && p.CreatedAt <= endDate);
+        // Calculate the start and end dates for the past month
+        var startDate = DateTime.UtcNow.AddMonths(-1);
+        var endDate = DateTime.UtcNow;
 
-            var result = new Integer { data = newPatientsCount };
-            return Result<Integer>.Success(result);
-        }
-        catch (Exception ex)
-        {
-            // Log the exception
-            return new Error[] { new Error("InternalError", "An internal server error occurred.") };
-        }
+        // Query the database for new patients within the past month
+        var newPatientsCount = await _repository
+            .GetAll<Patient>()
+            .CountAsync(p => p.CreatedAt >= startDate && p.CreatedAt <= endDate);
+
+        // Return the count of new patients
+        var result = new Integer { Data = newPatientsCount };
+        return Result.Success(result);
     }
 }

@@ -64,4 +64,16 @@ public class PatientController : ControllerBase
     {
         return _userManager.GetUserId(User)!;
     }
+
+    [HttpGet("new-patients-count")]
+    public async Task<IActionResult> GetNewPatientsCount([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        var result = await _patientService.GetNewPatientsCount(startDate, endDate);
+
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success(result));
+    }
+
 }

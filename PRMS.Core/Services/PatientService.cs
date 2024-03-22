@@ -179,4 +179,22 @@ public class PatientService : IPatientService
         await _unitOfWork.SaveChangesAsync();
         return Result.Success();
     }
+
+    public async Task<Result<Integer>> GetNewPatientsCount(DateTime startDate, DateTime endDate)
+    {
+        try
+        {
+            var newPatientsCount = await _repository
+                .GetAll<Patient>()
+                .CountAsync(p => p.CreatedAt >= startDate && p.CreatedAt <= endDate);
+
+            var result = new Integer { data = newPatientsCount };
+            return Result<Integer>.Success(result);
+        }
+        catch (Exception ex)
+        {
+            // Log the exception
+            return new Error[] { new Error("InternalError", "An internal server error occurred.") };
+        }
+    }
 }

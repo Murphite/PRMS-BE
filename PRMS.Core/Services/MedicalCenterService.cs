@@ -29,7 +29,6 @@ public class MedicalCenterService : IMedicalCenterService
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            //return Result.Failure<PaginatorDto<IEnumerable<GetMedicalCenterDTO>>>(new[] { new Error("User.Error", "User Not Found") });
             return new Error[] { new("User.Error", "User Not Found") };
         }
 
@@ -62,7 +61,7 @@ public class MedicalCenterService : IMedicalCenterService
                 Rating = (int)Math.Round(mc.Reviews.Average(r => r.Rating)),
                 // Calculate distance using GeoCalculator
                 Distance = GeoCalculator.CalculateDistance(userLatitude ?? 0, userLongitude ?? 0, mc.Address.Latitude ?? 0, mc.Address.Longitude ?? 0),
-                Categories = mc.CategoryPivot.Select(cp => cp.MedicalCenterCategory.Name).ToList()
+                Categories = mc.MedicalCenterCategories.Select(mcc => mcc.Name).ToList()
             })
             .Paginate(paginationFilter);
 

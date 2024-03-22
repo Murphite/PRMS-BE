@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Core.Services;
@@ -9,6 +10,7 @@ using PRMS.Domain.Entities;
 namespace PRMS.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/v1/medical-centers")]
 public class MedicalCenterController : Controller
 {
@@ -20,11 +22,8 @@ public class MedicalCenterController : Controller
         _medicalCenterService = medicalCenterService;
         this.signInManager = signInManager;
     }
-
-
-
+    
     [HttpGet]
-    [Authorize]
     public async Task<IActionResult> GetAllMedicalCenters([FromQuery] PaginationFilter paginationFilter)
     {
         // Get the current user
@@ -37,15 +36,13 @@ public class MedicalCenterController : Controller
         // Call the service method to retrieve all medical centers with pagination
         var result = await _medicalCenterService.GetAll(user.Id, userLongitude, userLatitude, paginationFilter);
 
-        // Check if the operation was successful
-        if (result.IsSuccess)
-        {
-            // Return the paginated list of medical centers
-            return Ok(result.Data);
-        }
+        // Check if the operation was unsuccessful
+        if (result.IsFailure)
+            // Return error response if the operation failed
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        // Return error response if the operation failed
-        return BadRequest(new { ErrorMessage = result.Errors });
+        // Return the paginated list of medical centers
+        return Ok(ResponseDto<object>.Success(result.Data));
     }
 
 }

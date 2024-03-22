@@ -107,19 +107,12 @@ namespace PRMS.Core.Services
 
         public async Task<Result<Integer>> GetTotalAppointmentsForDay(string physicianId, DateTime date)
         {
-            try
-            {
-                var totalAppointments = await _repository
-                                    .GetAll<Appointment>()
-                                    .CountAsync(a => a.PhysicianId == physicianId && a.CreatedAt.Date == date.Date);
-                var result = new Integer { data = totalAppointments };
-                return Result.Success(result);
-            }
-            catch (Exception)
-            {
-                // Log the exception
-                return new Error[] { new Error("InternalError", "An internal server error occurred.") };
-            }
+            var totalAppointments = await _repository
+                    .GetAll<Appointment>()
+                    .CountAsync(a => a.PhysicianId == physicianId && a.CreatedAt.Date == date.Date);
+
+            var result = new Integer { Data = totalAppointments };
+            return Result.Success(result);
         }
     }
 }

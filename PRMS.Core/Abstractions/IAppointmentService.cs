@@ -14,5 +14,5 @@ public interface IAppointmentService
 
 public class Integer
 {
-    public int data { get; set;}
+    public int Data { get; set;}
 }

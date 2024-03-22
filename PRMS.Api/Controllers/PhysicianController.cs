@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
+using PRMS.Domain.Entities;
 
 namespace PRMS.Api.Controllers;
 
@@ -12,10 +14,12 @@ namespace PRMS.Api.Controllers;
 public class PhysicianController : ControllerBase
 {
     private readonly IPhysicianService _physicianService;
+	private readonly UserManager<User> _userManager;
 
-    public PhysicianController(IPhysicianService physicianService)
+	public PhysicianController(IPhysicianService physicianService, UserManager<User> userManager)
     {
         _physicianService = physicianService;
+        _userManager = userManager;
     }
 
     [HttpGet("{physicianId}")]
@@ -38,4 +42,17 @@ public class PhysicianController : ControllerBase
 
         return Ok(ResponseDto<object>.Success(result.Data));
     }
+
+	[HttpGet("get-physician-prescriptions")]
+	public async Task<IActionResult> GetPhysicianPresciptions( [FromQuery] PaginationFilter? paginationFilter=null)
+	{
+		paginationFilter ??= new PaginationFilter();
+        var physicianUserId = _userManager.GetUserId(User);
+        var result = await _physicianService.FetchPhysicianPrescriptions(physicianUserId, paginationFilter);
+
+		if (result.IsFailure)
+			return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+		return Ok(ResponseDto<object>.Success(result.Data));
+	}
 }

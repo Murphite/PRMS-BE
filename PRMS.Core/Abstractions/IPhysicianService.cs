@@ -8,4 +8,6 @@ public interface IPhysicianService
         PaginationFilter paginationFilter);
 
     public Task<Result<PhysicianDetailsDto>> GetDetails(string physicianId);
+
+    public Task<Result<PaginatorDto<IEnumerable<PhysicianPrescriptionsDto>>>> FetchPhysicianPrescriptions(string physicianUserId, PaginationFilter paginationFilter);
 }

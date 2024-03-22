@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Entities;
@@ -26,16 +27,11 @@ public class PhysicianController : Controller
         // Call the service method to retrieve all medical Physicians with pagination
         var result = await _PhysicanService.GetAll(paginationFilter);
 
-        // Check if the operation was successful
-        if (result.IsSuccess)
-        {
-            // Return the paginated list of medical Physicians
-            return Ok(result.Data);
-        }
-
         // Return error response if the operation failed
-        return BadRequest(new { ErrorMessage = result.Errors });
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        // Return the paginated list of medical Physicians
+        return Ok(ResponseDto<object>.Success());
     }
-
-
 }

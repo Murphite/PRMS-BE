@@ -13,7 +13,7 @@ public class Repository : IRepository
         _context = context;
     }
 
-    public async Task Add<TEntity>(TEntity entity) where TEntity : Entity 
+    public async Task Add<TEntity>(TEntity entity) where TEntity : Entity
     {
         await _context.Set<TEntity>().AddAsync(entity);
     }

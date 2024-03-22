@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PRMS.Data.Contexts;
 using PRMS.Domain.Constants;
@@ -41,7 +43,9 @@ public static class Seeder
             await userManager.CreateAsync(user, "Admin@123");
             await userManager.AddToRoleAsync(user, RolesConstant.Admin);
             
-            var dataGenerator = new DataGenerator(context, userManager);
+            var config = app.ApplicationServices.CreateScope().ServiceProvider
+                .GetRequiredService<IConfiguration>();
+            var dataGenerator = new DataGenerator(context, userManager, config);
             await dataGenerator.Run();
         }
     }

@@ -7,8 +7,9 @@ public class MedicalCenterReview : Entity, IAuditable
     public string? Title { get; set; }
     public string? Content { get; set; }
     public int Rating { get; set; }
-    public DateTimeOffset CreatedAt { get; }
-    public DateTimeOffset UpdatedAt { get; }
+    
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
     
     public MedicalCenter MedicalCenter { get; set; }
     public Patient Patient { get; set; }

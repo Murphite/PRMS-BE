@@ -1,5 +1,7 @@
 ﻿using Bogus;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using PRMS.Data.Contexts;
 using PRMS.Domain.Constants;
 using PRMS.Domain.Entities;
@@ -11,16 +13,18 @@ public class DataGenerator
 {
     private readonly AppDbContext _context;
     private readonly UserManager<User> _userManager;
+    private readonly string _baseUrl;
 
     private readonly List<Patient> _patients = new();
     private readonly List<Physician> _physicians = new();
     private readonly List<MedicalCenterCategory> _categories = new();
 
-    public DataGenerator(AppDbContext context, UserManager<User> userManager)
+    public DataGenerator(AppDbContext context, UserManager<User> userManager, IConfiguration config)
     {
         Randomizer.Seed = new Random(54093);
         _context = context;
         _userManager = userManager;
+        _baseUrl = config.GetSection("ApiUrl").Value!;
     }
 
     public async Task Run()
@@ -37,14 +41,14 @@ public class DataGenerator
     {
         var categories = new List<MedicalCenterCategory>
         {
-            new() { Name = "dentistry", ImageUrl = "/assets/vectors/dentistry.svg" },
-            new() { Name = "cardiologist", ImageUrl = "/assets/vectors/cardiologist.svg" },
-            new() { Name = "pulmonologist", ImageUrl = "/assets/vectors/pulmonologist.svg" },
-            new() { Name = "general", ImageUrl = "/assets/vectors/general.svg" },
-            new() { Name = "neurology", ImageUrl = "/assets/vectors/neurology.svg" },
-            new() { Name = "gastroenterologist", ImageUrl = "/assets/vectors/gastroenterologist.svg" },
-            new() { Name = "laboratories", ImageUrl = "/assets/vectors/laboratories.svg" },
-            new() { Name = "vaccination", ImageUrl = "/assets/vectors/vaccination.svg" },
+            new() { Name = "dentistry", ImageUrl = _baseUrl + "/assets/vectors/dentistry.svg" },
+            new() { Name = "cardiologist", ImageUrl = _baseUrl + "/assets/vectors/cardiologist.svg" },
+            new() { Name = "pulmonologist", ImageUrl = _baseUrl + "/assets/vectors/pulmonologist.svg" },
+            new() { Name = "general", ImageUrl = _baseUrl + "/assets/vectors/general.svg" },
+            new() { Name = "neurology", ImageUrl = _baseUrl + "/assets/vectors/neurology.svg" },
+            new() { Name = "gastroenterologist", ImageUrl = _baseUrl + "/assets/vectors/gastroenterologist.svg" },
+            new() { Name = "laboratories", ImageUrl = _baseUrl + "/assets/vectors/laboratories.svg" },
+            new() { Name = "vaccination", ImageUrl = _baseUrl + "/assets/vectors/vaccination.svg" },
         };
 
         _categories.AddRange(categories);

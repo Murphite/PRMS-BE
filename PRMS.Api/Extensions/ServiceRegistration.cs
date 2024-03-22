@@ -50,12 +50,23 @@ public static class ServiceRegistration
             var key = Encoding.UTF8.GetBytes(configuration.GetSection("JWT:Key").Value);
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuerSigningKey = true,
+                ValidateIssuerSigningKey = false,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateLifetime = true,
+                ValidateLifetime = false,
                 ValidateAudience = false,
                 ValidateIssuer = false
             };
+        });
+        
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAllOrigins",
+                builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
         });
 
         services.AddScoped<IJwtService, JwtService>();
@@ -66,5 +77,9 @@ public static class ServiceRegistration
         services.AddScoped<IPhysicianService, PhysicianService>();
         services.AddScoped<IPatientService, PatientService>();
         services.AddScoped<IAdminPatientService, AdminPatientService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IAppointmentService, AppointmentService>();
+        services.AddScoped<IPhysicianService, PhysicianService>();
+        services.AddScoped<IPrescriptionService, PrescriptionService>();
     }
 }

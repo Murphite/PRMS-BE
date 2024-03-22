@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Api.Extensions;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
-using PRMS.Domain.Entities;
 
 namespace PRMS.Api.Controllers;
 
@@ -13,8 +11,8 @@ namespace PRMS.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-	
-	public AuthController(IAuthService authService)
+
+    public AuthController(IAuthService authService)
     {
         _authService = authService;
     }
@@ -30,22 +28,23 @@ public class AuthController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
 
-	[HttpPost("admin-register")]
-	public async Task<IActionResult> AdminRegister([FromBody] AdminRegisterDTO registerAdminDto)
-	{
-		if (!ModelState.IsValid)
-		{
-			return BadRequest(ResponseDto<object>.Failure(ModelState.GetErrors()));
-		}
-		var result = await _authService.AdminRegister(registerAdminDto);
+    [HttpPost("admin-register")]
+    public async Task<IActionResult> AdminRegister([FromBody] AdminRegisterDTO registerAdminDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ResponseDto<object>.Failure(ModelState.GetErrors()));
+        }
 
-		if (result.IsFailure)
-			return BadRequest(ResponseDto<object>.Failure(result.Errors));
+        var result = await _authService.AdminRegister(registerAdminDto);
 
-		return Ok(ResponseDto<object>.Success());
-	}
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-	[HttpPost("login")]
+        return Ok(ResponseDto<object>.Success());
+    }
+
+    [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserDto loginUserDto)
     {
         var result = await _authService.Login(loginUserDto);
@@ -73,11 +72,11 @@ public class AuthController : ControllerBase
     }
 
 
-    [HttpPost("ForgotPassword")]
+    [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ResetPasswordDto resetPasswordDto)
     {
         var result = await _authService.ForgotPassword(resetPasswordDto);
-        
+
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
@@ -93,5 +92,19 @@ public class AuthController : ControllerBase
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
         return Ok(ResponseDto<object>.Success());
+    }
+
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ResponseDto<object>.Failure(ModelState.GetErrors()));
+        }
+        var changePasswordResult = await _authService.ChangePasswordAsync(changePasswordDto);
+        if (changePasswordResult.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(changePasswordResult.Errors));
+
+        return Ok(ResponseDto<object>.Success(changePasswordResult));
     }
 }

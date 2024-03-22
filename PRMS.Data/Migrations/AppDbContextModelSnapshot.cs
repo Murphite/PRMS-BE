@@ -212,6 +212,9 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTimeOffset>("Date")
                         .HasColumnType("timestamp with time zone");
 
@@ -228,6 +231,9 @@ namespace PRMS.Data.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -270,6 +276,9 @@ namespace PRMS.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
@@ -282,6 +291,9 @@ namespace PRMS.Data.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -316,6 +328,9 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("MedicalCenterId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -329,6 +344,9 @@ namespace PRMS.Data.Migrations
 
                     b.Property<string>("Title")
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -344,12 +362,18 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("MedicalDetailsType")
                         .HasColumnType("integer");
 
                     b.Property<string>("PatientId")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -367,12 +391,14 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Dosage")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Duration")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Frequency")
@@ -393,6 +419,9 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("PrescriptionId")
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PatientId");
@@ -409,6 +438,9 @@ namespace PRMS.Data.Migrations
 
                     b.Property<int>("BloodGroup")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
@@ -434,6 +466,9 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("MedicalCenterId")
                         .HasColumnType("text");
 
+                    b.Property<string>("PhysicianId")
+                        .HasColumnType("text");
+
                     b.Property<string>("PrimaryPhysicanEmail")
                         .HasColumnType("text");
 
@@ -442,6 +477,9 @@ namespace PRMS.Data.Migrations
 
                     b.Property<string>("PrimaryPhysicanPhoneNo")
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -453,6 +491,8 @@ namespace PRMS.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("MedicalCenterId");
+
+                    b.HasIndex("PhysicianId");
 
                     b.HasIndex("UserId");
 
@@ -468,6 +508,9 @@ namespace PRMS.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("MedicalCenterId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -479,6 +522,9 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -508,6 +554,9 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("PatientId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -521,6 +570,9 @@ namespace PRMS.Data.Migrations
 
                     b.Property<string>("Title")
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -536,6 +588,9 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Diagnosis")
                         .IsRequired()
                         .HasColumnType("text");
@@ -550,6 +605,9 @@ namespace PRMS.Data.Migrations
                     b.Property<string>("PhysicianId")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -811,11 +869,17 @@ namespace PRMS.Data.Migrations
                         .WithMany("Patients")
                         .HasForeignKey("MedicalCenterId");
 
+                    b.HasOne("PRMS.Domain.Entities.Physician", "Physician")
+                        .WithMany("Patients")
+                        .HasForeignKey("PhysicianId");
+
                     b.HasOne("PRMS.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Physician");
 
                     b.Navigation("User");
                 });
@@ -911,6 +975,8 @@ namespace PRMS.Data.Migrations
             modelBuilder.Entity("PRMS.Domain.Entities.Physician", b =>
                 {
                     b.Navigation("Appointments");
+
+                    b.Navigation("Patients");
 
                     b.Navigation("Reviews");
                 });

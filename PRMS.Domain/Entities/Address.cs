@@ -12,4 +12,9 @@ public class Address : Entity, IAuditable
     
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+    
+    public override string ToString()
+    {
+        return $"{Street} {City} {State} {Country}";
+    }
 }

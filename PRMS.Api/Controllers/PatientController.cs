@@ -1,30 +1,67 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Entities;
+using PRMS.Domain.Enums;
 
-namespace PRMS.Api.Controllers
+namespace PRMS.Api.Controllers;
+
+[ApiController]
+[Authorize]
+[Route("api/v1/patient")]
+public class PatientController : ControllerBase
 {
-    [ApiController]
-    [Route("api/v1/patients")]
-    public class PatientController : ControllerBase
+    private readonly IPatientService _patientService;
+    private readonly UserManager<User> _userManager;
+
+    public PatientController(IPatientService patientService, UserManager<User> userManager)
     {
-        private readonly IPatientService _patientService;
+        _patientService = patientService;
+        _userManager = userManager;
+    }
 
-        public PatientController(IPatientService patientService)
+    [HttpPut]
+    public async Task<IActionResult> UpdateFromPatient([FromBody] UpdatePatientFromPatientDto dto)
+    {
+        var userId = _userManager.GetUserId(User);
+        var result = await _patientService.UpdateFromPatientAsync(dto, userId!);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateNewPatient([FromBody] CreatePatientFromUserDto patientDto)
+    {
+        var userId = GetUserId();
+        var response = await _patientService.CreatePatient(userId, patientDto);
+        if (response.IsFailure)
         {
-            _patientService = patientService;
+            return BadRequest(ResponseDto<object>.Failure(response.Errors));
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateFromPatient([FromBody] UpdatePatientFromPatientDto dto, string UserId)
-        {
-            var result = await _patientService.UpdateFromPatientAsync(dto, UserId);
-            if (result.IsFailure)
-                return BadRequest(ResponseDto<object>.Failure(result.Errors));
+        return Ok(ResponseDto<object>.Success());
+    }
 
-            return Ok(ResponseDto<object>.Success());
-        }
+    [HttpGet("appointments")]
+    public async Task<IActionResult> GetPatientAppointments([FromQuery] string? status = null,
+        [FromQuery] PaginationFilter? paginationFilter = null)
+    {
+        paginationFilter ??= new PaginationFilter();
+        var userId = _userManager.GetUserId(User);
+        var result = await _patientService.GetPatientAppointments(userId, status, paginationFilter);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success(result));
+    }
+
+    private string GetUserId()
+    {
+        return _userManager.GetUserId(User)!;
     }
 }

@@ -6,6 +6,7 @@ using PRMS.Domain.Entities;
 using PRMS.Api.Dtos;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Enums;
+using PRMS.Core.Services;
 
 namespace PRMS.Api.Controllers;
 
@@ -60,5 +61,17 @@ public class AppointmentController : ControllerBase
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
         return Ok(ResponseDto<object>.Success());
+    }
+
+    [HttpGet("{physicianId}/appointments/total")]
+    public async Task<IActionResult> GetTotalAppointmentsForDay(string physicianId, [FromQuery] DateTime date)
+    {
+        var result = await _appointmentService.GetTotalAppointmentsForDay(physicianId, date);
+       
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+       
+        return Ok(ResponseDto<object>.Success(result));
+
     }
 }

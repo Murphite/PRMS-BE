@@ -12,8 +12,8 @@ using PRMS.Data.Contexts;
 namespace PRMS.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240224195901_Initial")]
-    partial class Initial
+    [Migration("20240306211640_added_physician_to_patient_model")]
+    partial class added_physician_to_patient_model
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,21 @@ namespace PRMS.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("MedicalCenterMedicalCenterCategory", b =>
+                {
+                    b.Property<string>("MedicalCenterCategoriesId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MedicalCentersId")
+                        .HasColumnType("text");
+
+                    b.HasKey("MedicalCenterCategoriesId", "MedicalCentersId");
+
+                    b.HasIndex("MedicalCentersId");
+
+                    b.ToTable("MedicalCenterCategoryPivot", (string)null);
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -226,28 +241,6 @@ namespace PRMS.Data.Migrations
                     b.ToTable("Appointments");
                 });
 
-            modelBuilder.Entity("PRMS.Domain.Entities.CategoryMedicalCenterPivot", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("MedicalCenterCategoryId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("MedicalCenterId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MedicalCenterCategoryId");
-
-                    b.HasIndex("MedicalCenterId");
-
-                    b.ToTable("CategoryMedicalCenters");
-                });
-
             modelBuilder.Entity("PRMS.Domain.Entities.Favorite", b =>
                 {
                     b.Property<string>("Id")
@@ -423,6 +416,18 @@ namespace PRMS.Data.Migrations
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
 
+                    b.Property<string>("EmergencyContactName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EmergencyContactPhoneNo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EmergencyContactRelationship")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
@@ -430,6 +435,9 @@ namespace PRMS.Data.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("MedicalCenterId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhysicianId")
                         .HasColumnType("text");
 
                     b.Property<string>("PrimaryPhysicanEmail")
@@ -451,6 +459,8 @@ namespace PRMS.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("MedicalCenterId");
+
+                    b.HasIndex("PhysicianId");
 
                     b.HasIndex("UserId");
 
@@ -651,6 +661,21 @@ namespace PRMS.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("MedicalCenterMedicalCenterCategory", b =>
+                {
+                    b.HasOne("PRMS.Domain.Entities.MedicalCenterCategory", null)
+                        .WithMany()
+                        .HasForeignKey("MedicalCenterCategoriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PRMS.Domain.Entities.MedicalCenter", null)
+                        .WithMany()
+                        .HasForeignKey("MedicalCentersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -719,25 +744,6 @@ namespace PRMS.Data.Migrations
                     b.Navigation("Patient");
 
                     b.Navigation("Physician");
-                });
-
-            modelBuilder.Entity("PRMS.Domain.Entities.CategoryMedicalCenterPivot", b =>
-                {
-                    b.HasOne("PRMS.Domain.Entities.MedicalCenterCategory", "MedicalCenterCategory")
-                        .WithMany("MedicalCenterPivot")
-                        .HasForeignKey("MedicalCenterCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PRMS.Domain.Entities.MedicalCenter", "MedicalCenter")
-                        .WithMany("CategoryPivot")
-                        .HasForeignKey("MedicalCenterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MedicalCenter");
-
-                    b.Navigation("MedicalCenterCategory");
                 });
 
             modelBuilder.Entity("PRMS.Domain.Entities.Favorite", b =>
@@ -813,11 +819,17 @@ namespace PRMS.Data.Migrations
                         .WithMany("Patients")
                         .HasForeignKey("MedicalCenterId");
 
+                    b.HasOne("PRMS.Domain.Entities.Physician", "Physician")
+                        .WithMany("Patients")
+                        .HasForeignKey("PhysicianId");
+
                     b.HasOne("PRMS.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Physician");
 
                     b.Navigation("User");
                 });
@@ -890,18 +902,11 @@ namespace PRMS.Data.Migrations
 
             modelBuilder.Entity("PRMS.Domain.Entities.MedicalCenter", b =>
                 {
-                    b.Navigation("CategoryPivot");
-
                     b.Navigation("Patients");
 
                     b.Navigation("Physicians");
 
                     b.Navigation("Reviews");
-                });
-
-            modelBuilder.Entity("PRMS.Domain.Entities.MedicalCenterCategory", b =>
-                {
-                    b.Navigation("MedicalCenterPivot");
                 });
 
             modelBuilder.Entity("PRMS.Domain.Entities.Patient", b =>
@@ -920,6 +925,8 @@ namespace PRMS.Data.Migrations
             modelBuilder.Entity("PRMS.Domain.Entities.Physician", b =>
                 {
                     b.Navigation("Appointments");
+
+                    b.Navigation("Patients");
 
                     b.Navigation("Reviews");
                 });

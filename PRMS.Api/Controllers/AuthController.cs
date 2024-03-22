@@ -28,6 +28,22 @@ public class AuthController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
 
+    [HttpPost("admin-register")]
+    public async Task<IActionResult> AdminRegister([FromBody] AdminRegisterDTO registerAdminDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ResponseDto<object>.Failure(ModelState.GetErrors()));
+        }
+
+        var result = await _authService.AdminRegister(registerAdminDto);
+
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success());
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserDto loginUserDto)
     {
@@ -53,5 +69,42 @@ public class AuthController : ControllerBase
             return BadRequest(ResponseDto<object>.Failure(resetPasswordResult.Errors));
 
         return Ok(ResponseDto<object>.Success(resetPasswordResult));
+    }
+
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ResetPasswordDto resetPasswordDto)
+    {
+        var result = await _authService.ForgotPassword(resetPasswordDto);
+
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success());
+    }
+
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
+    {
+        var result = await _authService.ConfirmEmail(email, token);
+
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success());
+    }
+
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ResponseDto<object>.Failure(ModelState.GetErrors()));
+        }
+        var changePasswordResult = await _authService.ChangePasswordAsync(changePasswordDto);
+        if (changePasswordResult.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(changePasswordResult.Errors));
+
+        return Ok(ResponseDto<object>.Success(changePasswordResult));
     }
 }

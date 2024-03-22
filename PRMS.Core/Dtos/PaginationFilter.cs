@@ -7,7 +7,7 @@ public class PaginationFilter
         PageNumber = pageNumber < 1 ? 1 : pageNumber;
         PageSize = pageSize is > 10 or < 1 ? 10 : pageSize;
     }
-    
+
     public PaginationFilter()
     {
         PageNumber = 1;

@@ -8,6 +8,7 @@ public class MedicalDetail : Entity, IAuditable
     public MedicalDetailsType MedicalDetailsType { get; set; }
     public string Value { get; set; }
     
-    public DateTimeOffset CreatedAt { get; }
-    public DateTimeOffset UpdatedAt { get; }
+    
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 }

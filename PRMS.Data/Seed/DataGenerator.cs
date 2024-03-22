@@ -1,5 +1,7 @@
 ﻿using Bogus;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using PRMS.Data.Contexts;
 using PRMS.Domain.Constants;
 using PRMS.Domain.Entities;
@@ -11,16 +13,18 @@ public class DataGenerator
 {
     private readonly AppDbContext _context;
     private readonly UserManager<User> _userManager;
+    private readonly string _baseUrl;
 
     private readonly List<Patient> _patients = new();
     private readonly List<Physician> _physicians = new();
     private readonly List<MedicalCenterCategory> _categories = new();
 
-    public DataGenerator(AppDbContext context, UserManager<User> userManager)
+    public DataGenerator(AppDbContext context, UserManager<User> userManager, IConfiguration config)
     {
         Randomizer.Seed = new Random(54093);
         _context = context;
         _userManager = userManager;
+        _baseUrl = config.GetSection("ApiUrl").Value!;
     }
 
     public async Task Run()
@@ -37,14 +41,14 @@ public class DataGenerator
     {
         var categories = new List<MedicalCenterCategory>
         {
-            new() { Name = "dentistry", ImageUrl = "/assets/vectors/dentistry.svg" },
-            new() { Name = "cardiologist", ImageUrl = "/assets/vectors/cardiologist.svg" },
-            new() { Name = "pulmonologist", ImageUrl = "/assets/vectors/pulmonologist.svg" },
-            new() { Name = "general", ImageUrl = "/assets/vectors/general.svg" },
-            new() { Name = "neurology", ImageUrl = "/assets/vectors/neurology.svg" },
-            new() { Name = "gastroenterologist", ImageUrl = "/assets/vectors/gastroenterologist.svg" },
-            new() { Name = "laboratories", ImageUrl = "/assets/vectors/laboratories.svg" },
-            new() { Name = "vaccination", ImageUrl = "/assets/vectors/vaccination.svg" },
+            new() { Name = "dentistry", ImageUrl = _baseUrl + "/assets/vectors/dentistry.svg" },
+            new() { Name = "cardiologist", ImageUrl = _baseUrl + "/assets/vectors/cardiologist.svg" },
+            new() { Name = "pulmonologist", ImageUrl = _baseUrl + "/assets/vectors/pulmonologist.svg" },
+            new() { Name = "general", ImageUrl = _baseUrl + "/assets/vectors/general.svg" },
+            new() { Name = "neurology", ImageUrl = _baseUrl + "/assets/vectors/neurology.svg" },
+            new() { Name = "gastroenterologist", ImageUrl = _baseUrl + "/assets/vectors/gastroenterologist.svg" },
+            new() { Name = "laboratories", ImageUrl = _baseUrl + "/assets/vectors/laboratories.svg" },
+            new() { Name = "vaccination", ImageUrl = _baseUrl + "/assets/vectors/vaccination.svg" },
         };
 
         _categories.AddRange(categories);
@@ -111,6 +115,13 @@ public class DataGenerator
                 .RuleFor(p => p.DateOfBirth, f => f.Date.PastDateOnly(25))
                 .RuleFor(p => p.Gender, f => f.PickRandom(Gender.Female, Gender.Male))
                 .RuleFor(p => p.BloodGroup, f => f.PickRandom<BloodGroup>())
+                .RuleFor(p => p.PrimaryPhysicanName, f => f.Person.FullName)
+                .RuleFor(p => p.PrimaryPhysicanEmail, f => f.Person.Email)
+                .RuleFor(p => p.PrimaryPhysicanPhoneNo, f => f.Person.Phone)
+                .RuleFor(p => p.EmergencyContactName, f => f.Person.FullName)
+                .RuleFor(p => p.EmergencyContactRelationship,
+                    f => f.PickRandom("Father", "Mother", "Sibling", "Spouse", "Friend"))
+                .RuleFor(p => p.EmergencyContactPhoneNo, f => f.Person.Phone)
                 .RuleFor(p => p.Height, f => f.Random.Float(150, 200))
                 .RuleFor(p => p.Weight, f => f.Random.Float(50, 200))
                 .Generate();
@@ -120,7 +131,7 @@ public class DataGenerator
                 .RuleFor(d => d.MedicalDetailsType, MedicalDetailsType.Allergy)
                 .RuleFor(d => d.Value, f => f.Lorem.Sentence(2))
                 .Generate();
-            
+
             var detail2 = new Faker<MedicalDetail>()
                 .RuleFor(d => d.PatientId, patient.Id)
                 .RuleFor(d => d.MedicalDetailsType, MedicalDetailsType.MedicalCondition)
@@ -146,13 +157,10 @@ public class DataGenerator
             .RuleFor(m => m.Type, f => f.PickRandom<MedicalCenterType>())
             .Generate();
 
-        var pivot = new Faker<CategoryMedicalCenterPivot>()
-            .RuleFor(p => p.MedicalCenterId, medicalCenter.Id)
-            .RuleFor(p => p.MedicalCenterCategoryId, f => f.PickRandom(_categories).Id)
-            .Generate(2);
-
+        var categories = new Faker().PickRandom(_categories, 2).ToList();
+        medicalCenter.MedicalCenterCategories = categories;
         await _context.MedicalCenters.AddAsync(medicalCenter);
-        await _context.CategoryMedicalCenters.AddRangeAsync(pivot);
+        // await _context.MedicalCenters.AddRangeAsync(pivot);
 
         return medicalCenter;
     }
@@ -170,7 +178,8 @@ public class DataGenerator
                 .RuleFor(p => p.MedicalCenterId, medicalCenter.Id)
                 .RuleFor(p => p.Title, f => f.PickRandom(new[] { "Dr", "Nurse", "Pharm" }))
                 .RuleFor(p => p.Speciality,
-                    f => f.PickRandom("Cardiologist", "Dentist", "Neurologist", "Surgeon", "Gynecologist", "Pediatrics", "Orthoopedic Surgeon", "Psychiatrist"))
+                    f => f.PickRandom("Cardiologist", "Dentist", "Neurologist", "Surgeon", "Gynecologist", "Pediatrics",
+                        "Orthopedic Surgeon", "Psychiatrist"))
                 .RuleFor(p => p.About, f => f.Lorem.Paragraphs(3))
                 .RuleFor(p => p.WorkingTime, "Monday-Friday, 8am-6pm")
                 .RuleFor(p => p.YearsOfExperience, f => f.Random.Int(2, 30))

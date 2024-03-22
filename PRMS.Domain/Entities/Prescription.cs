@@ -6,8 +6,9 @@ public class Prescription : Entity, IAuditable
     public string PhysicianId { get; set; }
     public string Diagnosis { get; set; }
     public string? Note { get; set; }
-    public DateTimeOffset CreatedAt { get; }
-    public DateTimeOffset UpdatedAt { get; }
+    
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
     
     public Patient Patient { get; set; }
     public Physician Physician { get; set; }

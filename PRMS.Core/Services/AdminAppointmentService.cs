@@ -87,4 +87,69 @@ public class AdminAppointmentService : IAdminAppointmentService
 
         return Result.Success(appointmentToReturn);
     }
+
+    public async Task<Result> GetAllPhysicianAppointmentsSortedByDate(string physicianUserId, PaginationFilter paginationFilter)
+    {
+        var physician = await _userManager.FindByIdAsync(physicianUserId);
+        if (physician == null)
+        {
+            return new Error[] { new Error("User.Error", "This physician is not registered") };
+        }
+
+        var appointments = _repository.GetAll<Appointment>()
+    .Where(c => c.PhysicianId == physicianUserId)
+    .OrderByDescending(c => c.Date)
+    .Include(c => c.Patient.User)
+    .Include(c => c.Patient.Medications)
+    .Include(c => c.Patient.MedicalDetails)
+    .Select(r => new GetPhysicianAppointmentsByDateDto
+    {
+        FirstName = r.Patient.User.FirstName,
+        LastName = r.Patient.User.LastName,
+        Email = r.Patient.User.Email,
+        ImageUrl = r.Patient.User.ImageUrl,
+        Height = r.Patient.Height,
+        Weight = r.Patient.Weight,
+        BloodType = r.Patient.BloodGroup,
+        PhysicianName = r.Patient.PrimaryPhysicanName,
+        Date = r.Date,
+        CurrentMedication = r.Patient.Medications.Select(m => new PatientMedication
+        (
+            m.Dosage,
+            m.Name,
+            m.Frequency
+        )).ToList(),
+        MedicalConditions = r.Patient.MedicalDetails
+            .Where(md => md.MedicalDetailsType == MedicalDetailsType.MedicalCondition)
+            .Select(md => md.MedicalDetailsType)
+            .ToList(),
+        Allergies = r.Patient.MedicalDetails
+            .Where(md => md.MedicalDetailsType == MedicalDetailsType.Allergy)
+            .Select(md => md.MedicalDetailsType)
+            .ToList()
+    })
+    .Paginate(paginationFilter);
+
+        return Result.Success(appointments);
+    }
+
+    public async Task<Result> GetMonthlyAppointmentsForYear(string status, int year)
+    {
+        var appointments = await _repository.GetAll<Appointment>()
+            .Where(a => a.Date.Year == year && a.Status == Enum.Parse<AppointmentStatus>(status))
+            .Include(a => a.Patient.User)
+            .ToListAsync();
+
+        var monthlyAppointments = appointments.GroupBy(a => a.Date.Month)
+            .Select(g => new MonthlyAppointmentsDto
+            {
+                Month = g.Key,
+                Date = g.Select(a => a.Date).FirstOrDefault(),
+                PatientName = g.Select(a => $"{a.Patient.User.FirstName} {a.Patient.User.LastName}").FirstOrDefault(),
+                Status = g.Select(a => a.Status).FirstOrDefault(),
+                ImageUrl = g.Select(a => a.Patient.User.ImageUrl).FirstOrDefault()
+            }).ToList();
+
+        return Result.Success(monthlyAppointments);
+    }
 }

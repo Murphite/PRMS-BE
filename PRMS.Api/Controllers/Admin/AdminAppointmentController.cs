@@ -50,20 +50,11 @@ public class AdminAppointmentController : ControllerBase
     [HttpGet("physician-date-appointments")]
     public async Task<IActionResult> GetAllPhysicianAppointmentsSortedByDate()
     {
-        var physicianUserId = User.Identity.Name;
+        var physicianUserId = _userManager.GetUserId(User);
         var result = await _adminAppointmentService.GetAllPhysicianAppointmentsSortedByDate(physicianUserId, new PaginationFilter());
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        return Ok(ResponseDto<object>.Success());
-    }
-
-    [HttpGet("monthly-appointments")]
-    public async Task<IActionResult> GetMonthlyAppointmentsForYear([FromQuery] string status, [FromQuery] int year)
-    {
-        var result = await _adminAppointmentService.GetMonthlyAppointmentsForYear(status, year);
-        if (result.IsFailure)
-            return BadRequest(ResponseDto<object>.Failure(result.Errors));
         return Ok(ResponseDto<object>.Success());
     }
 }

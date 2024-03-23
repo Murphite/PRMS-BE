@@ -107,6 +107,14 @@ namespace PRMS.Core.Services
 
         public async Task<Result<Integer>> GetTotalAppointmentsForDay(string physicianId, DateTime date)
         {
+            // Check if the physician exists
+            var physicianExists = await _repository.GetAll<Physician>().AnyAsync(p => p.Id == physicianId);
+            if (!physicianExists)
+            {
+                return new Error[] { new Error("PhysicianNotFound", "The physician does not exist.") };
+            }
+
+            // Query the total appointments for the day
             var totalAppointments = await _repository
                     .GetAll<Appointment>()
                     .CountAsync(a => a.PhysicianId == physicianId && a.CreatedAt.Date == date.Date);

@@ -64,10 +64,13 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpGet("{physicianId}/appointments/total")]
-    public async Task<IActionResult> GetTotalAppointmentsForDay(string physicianId, [FromQuery] DateTime date)
+    public async Task<IActionResult> GetTotalAppointmentsForDay(string physicianId, [FromQuery] DateTime? date)
     {
-        var result = await _appointmentService.GetTotalAppointmentsForDay(physicianId, date);
-       
+        // If date is not provided, default it to the current day
+        DateTime currentDate = date ?? DateTime.UtcNow.Date;
+
+        var result = await _appointmentService.GetTotalAppointmentsForDay(physicianId, currentDate);
+
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
        

@@ -46,6 +46,12 @@ public class AdminAppointmentController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
 
-
-
+    [HttpGet("monthly-appointments")]
+    public async Task<IActionResult> GetMonthlyAppointmentsForYear([FromQuery] string status, [FromQuery] int year)
+    {
+        var result = await _adminAppointmentService.GetMonthlyAppointmentsForYear(status, year);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+        return Ok(ResponseDto<object>.Success());
+    }
 }

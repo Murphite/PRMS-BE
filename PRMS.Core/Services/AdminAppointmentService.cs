@@ -87,4 +87,33 @@ public class AdminAppointmentService : IAdminAppointmentService
 
         return Result.Success(appointmentToReturn);
     }
+
+    public async Task<Result> GetMonthlyAppointmentsForYear(string status, int year)
+    {
+        var query = _repository.GetAll<Appointment>()
+            .Where(a => a.Date.Year == year && a.Status == Enum.Parse<AppointmentStatus>(status))
+            .Include(a => a.Patient.User)
+            .Select(a => new
+            {
+                a.Date.Month,
+                a.Date,
+                PatientName = $"{a.Patient.User.FirstName} {a.Patient.User.LastName}",
+                a.Status,
+                a.Patient.User.ImageUrl
+            })
+            .AsQueryable();
+
+        var monthlyAppointments = await query.GroupBy(a => a.Month)
+            .Select(g => new MonthlyAppointmentsDto
+            {
+                Month = g.Key,
+                Date = g.FirstOrDefault().Date,
+                PatientName = g.FirstOrDefault().PatientName,
+                Status = g.FirstOrDefault().Status,
+                ImageUrl = g.FirstOrDefault().ImageUrl
+            })
+            .ToListAsync();
+
+        return Result.Success(monthlyAppointments);
+    }
 }

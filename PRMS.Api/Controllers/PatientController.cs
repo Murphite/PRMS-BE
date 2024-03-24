@@ -64,4 +64,16 @@ public class PatientController : ControllerBase
     {
         return _userManager.GetUserId(User)!;
     }
+
+    [HttpGet("new-patients-count")]
+    public async Task<IActionResult> GetNewPatientsCount()
+    {
+        var result = await _patientService.GetNewPatientsCount();
+
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success(result));
+    }
+
 }

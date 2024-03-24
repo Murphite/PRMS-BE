@@ -2,8 +2,6 @@
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Entities;
-using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using PRMS.Domain.Enums;
 
@@ -105,5 +103,22 @@ namespace PRMS.Core.Services
             return Result.Success();
         }
 
+        public async Task<Result<Integer>> GetTotalAppointmentsForDay(string physicianId, DateTime date)
+        {
+            // Check if the physician exists
+            var physicianExists = await _repository.GetAll<Physician>().AnyAsync(p => p.Id == physicianId);
+            if (!physicianExists)
+            {
+                return new Error[] { new Error("PhysicianNotFound", "The physician does not exist.") };
+            }
+
+            // Query the total appointments for the day
+            var totalAppointments = await _repository
+                    .GetAll<Appointment>()
+                    .CountAsync(a => a.PhysicianId == physicianId && a.CreatedAt.Date == date.Date);
+
+            var result = new Integer { Data = totalAppointments };
+            return Result.Success(result);
+        }
     }
 }

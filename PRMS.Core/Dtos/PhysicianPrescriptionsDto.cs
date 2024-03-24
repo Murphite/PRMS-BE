@@ -8,13 +8,13 @@ namespace PRMS.Core.Dtos
 {
 	public class PhysicianPrescriptionsDto
 	{
-		public string medicationId { get; set; }
-		public string presceiptionId { get; set; }
-		public string date { get; set; }
-		public string patientName { get; set; }
-		public string medicationName { get; set; }
-		public string dosage { get; set; }
-		public string? instructions { get; set; }
-		public string medicationStatus { get; set; }
+		public string MedicationId { get; set; }
+		public string PrescriptionId { get; set; }
+		public string Date { get; set; }
+		public string PatientName { get; set; }
+		public string MedicationName { get; set; }
+		public string Dosage { get; set; }
+		public string? Instructions { get; set; }
+		public string MedicationStatus { get; set; }
 	}
 }

@@ -98,14 +98,14 @@ public class PhysicianService : IPhysicianService
              .ThenInclude(m => m.User)
              .Select(m => new PhysicianPrescriptionsDto
              {
-                 medicationId = m.Id,
-                 presceiptionId = m.PrescriptionId,
-                 date = m.CreatedAt.ToString("MMMM dd,yyyy"),
-                 patientName = $"{m.Patient.User.FirstName} {m.Patient.User.LastName}",
-                 medicationName = m.Name,
-                 dosage = m.Dosage,
-                 instructions = m.Instruction,
-                 medicationStatus=m.MedicationStatus.ToString(),
+                 MedicationId = m.Id,
+                 PrescriptionId = m.PrescriptionId,
+                 Date = m.CreatedAt.ToString("MMMM dd,yyyy"),
+                 PatientName = $"{m.Patient.User.FirstName} {m.Patient.User.LastName}",
+                 MedicationName = m.Name,
+                 Dosage = m.Dosage,
+                 Instructions = m.Instruction,
+                 MedicationStatus=m.MedicationStatus.ToString(),
              }).Paginate(paginationFilter);
 
         return physicianPrescriptions;

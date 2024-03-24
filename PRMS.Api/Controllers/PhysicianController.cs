@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
+using PRMS.Core.Services;
 using PRMS.Domain.Entities;
+using System.Threading.Tasks;
 
 namespace PRMS.Api.Controllers;
 
@@ -40,6 +42,20 @@ public class PhysicianController : ControllerBase
         if(result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
+        return Ok(ResponseDto<object>.Success(result.Data));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllMedicalPhysicians([FromQuery] PaginationFilter paginationFilter)
+    {
+        // Call the service method to retrieve all medical Physicians with pagination
+        var result = await _physicianService.GetAll(paginationFilter);
+
+        // Return error response if the operation failed
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        // Return the paginated list of medical Physicians
         return Ok(ResponseDto<object>.Success(result.Data));
     }
 

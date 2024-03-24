@@ -47,6 +47,17 @@ public class AdminAppointmentController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
 
+    [HttpGet("monthly-appointments")]
+    public async Task<IActionResult> GetMonthlyAppointmentsForYear(string physicianId, PaginationFilter? paginationFilter, string status, int year)
+    {
+        paginationFilter ??= new PaginationFilter();
+        var result = await _adminAppointmentService.GetMonthlyAppointmentsForYear(physicianId, status, year, paginationFilter );
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+            
+        return Ok(ResponseDto<object>.Success(result.Data));
+    }
+    
     [HttpGet("physician-date-appointments")]
     public async Task<IActionResult> GetAllPhysicianAppointmentsSortedByDate(string physicianId, PaginationFilter? paginationFilter)
     {

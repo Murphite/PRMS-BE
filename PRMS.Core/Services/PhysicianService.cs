@@ -83,7 +83,6 @@ public class PhysicianService : IPhysicianService
 
         return Result.Success(paginatedPhysicans);
     }
-    } 
 
     public async Task<Result<PaginatorDto<IEnumerable<PhysicianPrescriptionsDto>>>> FetchPhysicianPrescriptions(string physicianUserId, PaginationFilter paginationFilter)
     {
@@ -104,7 +103,7 @@ public class PhysicianService : IPhysicianService
                  medicationName = m.Name,
                  dosage = m.Dosage,
                  instructions = m.Instruction,
-                 //medicationStatus=m.med
+                 medicationStatus=m.MedicationStatus.ToString(),
              }).Paginate(paginationFilter);
 
         return physicianPrescriptions;

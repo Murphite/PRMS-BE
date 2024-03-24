@@ -14,7 +14,5 @@ public interface IPhysicianService
 
     public Task<Result<PhysicianDetailsDto>> GetDetails(string physicianId);
     public Task<Result<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>> GetAll(PaginationFilter paginationFilter);   
-}
-
     public Task<Result<PaginatorDto<IEnumerable<PhysicianPrescriptionsDto>>>> FetchPhysicianPrescriptions(string physicianUserId, PaginationFilter paginationFilter);
 }

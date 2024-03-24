@@ -59,7 +59,7 @@ public class PhysicianController : ControllerBase
         return Ok(ResponseDto<object>.Success(result.Data));
     }
 
-	[HttpGet("get-physician-prescriptions")]
+    [HttpGet("get-physician-prescriptions")]
 	public async Task<IActionResult> GetPhysicianPresciptions([FromQuery] PaginationFilter? paginationFilter=null)
 	{
 		paginationFilter ??= new PaginationFilter();

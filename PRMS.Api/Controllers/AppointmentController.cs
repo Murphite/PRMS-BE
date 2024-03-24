@@ -23,7 +23,7 @@ public class AppointmentController : ControllerBase
         _appointmentService = appointmentService;
         _userManager = userManager;
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentDto appointmentDto)
     {
@@ -53,6 +53,7 @@ public class AppointmentController : ControllerBase
 
         return Ok(ResponseDto<object>.Success());
     }
+
     [HttpPut("{appointmentId}/reschedule")]
     public async Task<IActionResult> RescheduleAppointment([FromRoute] string appointmentId, [FromBody] RescheduleAppointmentDto rescheduleDto)
     {

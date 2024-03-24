@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
+using PRMS.Core.Services;
 using PRMS.Domain.Constants;
 using PRMS.Domain.Entities;
 
@@ -23,8 +24,8 @@ public class AdminAppointmentController : ControllerBase
         _userManager = userManager;
     }
 
-	[HttpGet("patient-appointment")]
-	public async Task<IActionResult> GetPatientAppointments([FromQuery] string? status = null, PaginationFilter? paginationFilter = null)
+    [HttpGet("patient-appointment")]
+    public async Task<IActionResult> GetPatientAppointments([FromQuery] string? status = null, PaginationFilter? paginationFilter = null)
     {
         paginationFilter ??= new PaginationFilter();
         var physicianUserId = _userManager.GetUserId(User);
@@ -36,7 +37,7 @@ public class AdminAppointmentController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
     [HttpGet("physician-ranged-appointments")]
-	public async Task<IActionResult> GetAllPhysicianRangedAppointments()
+    public async Task<IActionResult> GetAllPhysicianRangedAppointments()
     {
         var physicianUserId = _userManager.GetUserId(User);
         var result = await _adminAppointmentService.GetAllPhysicianRangedAppointments(physicianUserId!);
@@ -46,6 +47,14 @@ public class AdminAppointmentController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
 
+    [HttpGet("physician-date-appointments")]
+    public async Task<IActionResult> GetAllPhysicianAppointmentsSortedByDate(string physicianId, PaginationFilter? paginationFilter)
+    {
+        paginationFilter ??= new PaginationFilter();
+        var result = await _adminAppointmentService.GetAllPhysicianAppointmentsSortedByDate(physicianId, paginationFilter);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-
+        return Ok(ResponseDto<object>.Success(result.Data));
+    }
 }

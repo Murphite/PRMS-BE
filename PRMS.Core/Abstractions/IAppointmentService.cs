@@ -9,5 +9,10 @@ public interface IAppointmentService
     public Task<Result> UpdateAppointmentStatus(string userId, string appointmentId, AppointmentStatus status);
     public Task<Result> CreateAppointment(string userId, CreateAppointmentDto appointmentDto);
     public Task<Result> RescheduleAppointment(string appointmentId, RescheduleAppointmentDto rescheduleDto);
+    public Task<Result<Integer>> GetTotalAppointmentsForDay(string physicianId, DateTime date);
+}
 
+public class Integer
+{
+    public int Data { get; set;}
 }

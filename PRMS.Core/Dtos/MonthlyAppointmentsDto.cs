@@ -1,7 +1,7 @@
 ﻿using PRMS.Domain.Enums;
 
-namespace PRMS.Core.Dtos
-{
+namespace PRMS.Core.Dtos;
+
     public class MonthlyAppointmentsDto
     {
         public string PatientName { get; set; }
@@ -10,4 +10,3 @@ namespace PRMS.Core.Dtos
         public DateTimeOffset Date { get; set; }
         public string ImageUrl { get; set; }
     }
-}

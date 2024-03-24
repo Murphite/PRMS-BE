@@ -128,3 +128,48 @@ public class AdminAppointmentService : IAdminAppointmentService
         return monthlyAppointments;
     }
 }
+    public async Task<Result<PaginatorDto<IEnumerable<GetPhysicianAppointmentsByDateDto>>>> GetAllPhysicianAppointmentsSortedByDate(string physicianUserId, PaginationFilter paginationFilter)
+    {
+        var physician = await _userManager.FindByIdAsync(physicianUserId);
+        if (physician == null)
+        {
+            return new Error[] { new Error("User.Error", "This physician is not registered") };
+        }
+
+        var appointments = await _repository.GetAll<Appointment>()
+            .Where(c => c.PhysicianId == physicianUserId)
+            .OrderByDescending(c => c.Date)
+            .AsQueryable()
+            .Select(r => new GetPhysicianAppointmentsByDateDto
+    {
+        FirstName = r.Patient.User.FirstName,
+        LastName = r.Patient.User.LastName,
+        Email = r.Patient.User.Email,
+        ImageUrl = r.Patient.User.ImageUrl,
+        Height = r.Patient.Height,
+        Weight = r.Patient.Weight,
+        BloodType = r.Patient.BloodGroup,
+        PhysicianName = r.Patient.PrimaryPhysicanName,
+        Date = r.Date,
+        CurrentMedication = r.Patient.Medications
+            .Select(m => new PatientMedication
+            (
+                m.Dosage,
+                m.Name,
+                m.Frequency
+            ))
+            .ToList(),
+        MedicalConditions = r.Patient.MedicalDetails
+            .Where(md => md.MedicalDetailsType == MedicalDetailsType.MedicalCondition)
+            .Select(md => md.MedicalDetailsType)
+            .ToList(),
+        Allergies = r.Patient.MedicalDetails
+            .Where(md => md.MedicalDetailsType == MedicalDetailsType.Allergy)
+            .Select(md => md.MedicalDetailsType)
+            .ToList()
+    })
+    .Paginate(paginationFilter);
+
+        return appointments;
+    }
+}

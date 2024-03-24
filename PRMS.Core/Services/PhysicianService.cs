@@ -70,7 +70,8 @@ public class PhysicianService : IPhysicianService
                  patientName = $"{m.Patient.User.FirstName} {m.Patient.User.LastName}",
                  medicationName = m.Name,
                  dosage = m.Dosage,
-                 instructions = m.Instruction
+                 instructions = m.Instruction,
+                 //medicationStatus=m.med
              }).Paginate(paginationFilter);
 
         return physicianPrescriptions;

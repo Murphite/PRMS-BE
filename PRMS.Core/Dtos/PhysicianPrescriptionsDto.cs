@@ -13,6 +13,6 @@ namespace PRMS.Core.Dtos
 		public string medicationName { get; set; }
 		public string dosage { get; set; }
 		public string? instructions { get; set; }
-		//public string status { get; set; }
+		public string medicationStatus { get; set; }
 	}
 }

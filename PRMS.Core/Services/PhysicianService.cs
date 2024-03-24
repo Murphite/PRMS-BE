@@ -98,6 +98,8 @@ public class PhysicianService : IPhysicianService
              .ThenInclude(m => m.User)
              .Select(m => new PhysicianPrescriptionsDto
              {
+                 medicationId = m.Id,
+                 presceiptionId = m.PrescriptionId,
                  date = m.CreatedAt.ToString("MMMM dd,yyyy"),
                  patientName = $"{m.Patient.User.FirstName} {m.Patient.User.LastName}",
                  medicationName = m.Name,

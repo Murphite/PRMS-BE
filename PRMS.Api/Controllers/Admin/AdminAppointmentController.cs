@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
+using PRMS.Core.Services;
 using PRMS.Domain.Constants;
 using PRMS.Domain.Entities;
 
@@ -47,11 +48,12 @@ public class AdminAppointmentController : ControllerBase
     }
 
     [HttpGet("monthly-appointments")]
-    public async Task<IActionResult> GetMonthlyAppointmentsForYear([FromQuery] string status, [FromQuery] int year)
+    public async Task<IActionResult> GetMonthlyAppointmentsForYear(string physicianId, PaginationFilter? paginationFilter, string status, int year)
     {
-        var result = await _adminAppointmentService.GetMonthlyAppointmentsForYear(status, year);
+        paginationFilter ??= new PaginationFilter();
+        var result = await _adminAppointmentService.GetMonthlyAppointmentsForYear(physicianId, status, year, paginationFilter );
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
-        return Ok(ResponseDto<object>.Success());
+        return Ok(ResponseDto<object>.Success(result.Data));
     }
 }

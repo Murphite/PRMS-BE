@@ -88,32 +88,43 @@ public class AdminAppointmentService : IAdminAppointmentService
         return Result.Success(appointmentToReturn);
     }
 
-    public async Task<Result> GetMonthlyAppointmentsForYear(string status, int year)
+    public async Task<Result<PaginatorDto<IEnumerable<MonthlyAppointmentsDto>>>> GetMonthlyAppointmentsForYear(string physicianUserId,string status, int year, PaginationFilter paginationFilter)
     {
-        var query = _repository.GetAll<Appointment>()
-            .Where(a => a.Date.Year == year && a.Status == Enum.Parse<AppointmentStatus>(status))
-            .Include(a => a.Patient.User)
-            .Select(a => new
-            {
-                a.Date.Month,
-                a.Date,
-                PatientName = $"{a.Patient.User.FirstName} {a.Patient.User.LastName}",
-                a.Status,
-                a.Patient.User.ImageUrl
-            })
-            .AsQueryable();
 
-        var monthlyAppointments = await query.GroupBy(a => a.Month)
-            .Select(g => new MonthlyAppointmentsDto
-            {
-                Month = g.Key,
-                Date = g.FirstOrDefault().Date,
-                PatientName = g.FirstOrDefault().PatientName,
-                Status = g.FirstOrDefault().Status,
-                ImageUrl = g.FirstOrDefault().ImageUrl
-            })
-            .ToListAsync();
+        var physician = await _userManager.FindByIdAsync(physicianUserId);
+        if (physician == null)
+        {
+            return new Error[] { new("User.Error", "This physician is not registered") };
+        }
 
-        return Result.Success(monthlyAppointments);
+        // Parse the status string to the AppointmentStatus enum
+            if (!Enum.TryParse(status, out AppointmentStatus appointmentStatus))
+        {
+            return new Error[] { new Error("Status.Error", "Invalid status value") };
+        }
+
+        var monthlyAppointments = await _repository.GetAll<Appointment>()
+        .Where(a => a.Date.Year == year && a.Status == appointmentStatus)
+        .Include(a => a.Patient.User)
+        .Select(a => new
+        {
+            a.Date.Month,
+            a.Date,
+            PatientName = $"{a.Patient.User.FirstName} {a.Patient.User.LastName}",
+            a.Status,
+            a.Patient.User.ImageUrl
+        })
+        .AsQueryable()
+        .GroupBy(a => a.Month)
+        .Select(g => new MonthlyAppointmentsDto
+        {
+            Month = g.Key,
+            Date = g.FirstOrDefault().Date,
+            PatientName = g.FirstOrDefault().PatientName,
+            Status = g.FirstOrDefault().Status,
+            ImageUrl = g.FirstOrDefault().ImageUrl
+        }).Paginate(paginationFilter);
+
+        return monthlyAppointments;
     }
 }

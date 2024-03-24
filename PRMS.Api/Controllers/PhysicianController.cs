@@ -44,11 +44,11 @@ public class PhysicianController : ControllerBase
     }
 
 	[HttpGet("get-physician-prescriptions")]
-	public async Task<IActionResult> GetPhysicianPresciptions( [FromQuery] PaginationFilter? paginationFilter=null)
+	public async Task<IActionResult> GetPhysicianPresciptions([FromQuery] PaginationFilter? paginationFilter=null)
 	{
 		paginationFilter ??= new PaginationFilter();
         var physicianUserId = _userManager.GetUserId(User);
-        var result = await _physicianService.FetchPhysicianPrescriptions(physicianUserId, paginationFilter);
+        var result = await _physicianService.FetchPhysicianPrescriptions(physicianUserId!, paginationFilter);
 
 		if (result.IsFailure)
 			return BadRequest(ResponseDto<object>.Failure(result.Errors));

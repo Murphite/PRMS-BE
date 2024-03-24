@@ -58,20 +58,20 @@ public class PhysicianService : IPhysicianService
 			.Where(p => p.UserId == physicianUserId)
             .Select(p=>p.Id)
 			.FirstOrDefaultAsync();
-          
-        var physicianPrescriptions =await _repository.GetAll<Medication>()
+
+        var physicianPrescriptions =  await _repository.GetAll<Medication>()
              .Include(m => m.Prescription)
              .Where(m => m.Prescription.PhysicianId == physicianId)
-             .Include(m=>m.Patient)
-             .ThenInclude(m=>m.User)
-             .Select(m=> new PhysicianPrescriptionsDto
+             .Include(m => m.Patient)
+             .ThenInclude(m => m.User)
+             .Select(m => new PhysicianPrescriptionsDto
              {
-                 date=m.UpdatedAt.ToString("MMMM dd,yyyy"),
-                 patientName=$"{m.Patient.User.FirstName} {m.Patient.User.LastName}",
-                 medicationName=m.Name,
-                 dosage=m.Dosage,
-                 instructions=m.Instruction
-             }).Paginate(paginationFilter); 
+                 date = m.CreatedAt.ToString("MMMM dd,yyyy"),
+                 patientName = $"{m.Patient.User.FirstName} {m.Patient.User.LastName}",
+                 medicationName = m.Name,
+                 dosage = m.Dosage,
+                 instructions = m.Instruction
+             }).Paginate(paginationFilter);
 
         return physicianPrescriptions;
 	}

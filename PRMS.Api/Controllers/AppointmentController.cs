@@ -22,7 +22,7 @@ public class AppointmentController : ControllerBase
         _appointmentService = appointmentService;
         _userManager = userManager;
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentDto appointmentDto)
     {
@@ -34,7 +34,8 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpGet("physician/{physicianUserId}")]
-    public async Task<IActionResult> GetPhysicianAppointments([FromRoute] string physicianUserId, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
+    public async Task<IActionResult> GetPhysicianAppointments([FromRoute] string physicianUserId,
+        [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
     {
         var result = await _appointmentService.GetAppointmentsForPhysician(physicianUserId, startDate, endDate);
         if (result.IsFailure)
@@ -43,7 +44,8 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{appointmentId}/status")]
-    public async Task<IActionResult> UpdateAppointmentStatus([FromRoute] string appointmentId, [FromBody] AppointmentStatus status)
+    public async Task<IActionResult> UpdateAppointmentStatus([FromRoute] string appointmentId,
+        [FromBody] AppointmentStatus status)
     {
         var userId = _userManager.GetUserId(User);
         var result = await _appointmentService.UpdateAppointmentStatus(userId!, appointmentId, status);
@@ -52,8 +54,10 @@ public class AppointmentController : ControllerBase
 
         return Ok(ResponseDto<object>.Success());
     }
+
     [HttpPut("{appointmentId}/reschedule")]
-    public async Task<IActionResult> RescheduleAppointment([FromRoute] string appointmentId, [FromBody] RescheduleAppointmentDto rescheduleDto)
+    public async Task<IActionResult> RescheduleAppointment([FromRoute] string appointmentId,
+        [FromBody] RescheduleAppointmentDto rescheduleDto)
     {
         var userId = _userManager.GetUserId(User);
         var result = await _appointmentService.RescheduleAppointment(appointmentId, rescheduleDto);

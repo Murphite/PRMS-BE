@@ -48,13 +48,13 @@ public class AdminAppointmentController : ControllerBase
     }
 
     [HttpGet("physician-date-appointments")]
-    public async Task<IActionResult> GetAllPhysicianAppointmentsSortedByDate()
+    public async Task<IActionResult> GetAllPhysicianAppointmentsSortedByDate(string physicianId, PaginationFilter? paginationFilter)
     {
-        var physicianUserId = _userManager.GetUserId(User);
-        var result = await _adminAppointmentService.GetAllPhysicianAppointmentsSortedByDate(physicianUserId, new PaginationFilter());
+        paginationFilter ??= new PaginationFilter();
+        var result = await _adminAppointmentService.GetAllPhysicianAppointmentsSortedByDate(physicianId, paginationFilter);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        return Ok(ResponseDto<object>.Success());
+        return Ok(ResponseDto<object>.Success(result.Data));
     }
 }

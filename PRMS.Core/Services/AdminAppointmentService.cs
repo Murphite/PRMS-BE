@@ -88,7 +88,7 @@ public class AdminAppointmentService : IAdminAppointmentService
         return Result.Success(appointmentToReturn);
     }
 
-    public async Task<Result> GetAllPhysicianAppointmentsSortedByDate(string physicianUserId, PaginationFilter paginationFilter)
+    public async Task<Result<PaginatorDto<IEnumerable<GetPhysicianAppointmentsByDateDto>>>> GetAllPhysicianAppointmentsSortedByDate(string physicianUserId, PaginationFilter paginationFilter)
     {
         var physician = await _userManager.FindByIdAsync(physicianUserId);
         if (physician == null)
@@ -96,42 +96,40 @@ public class AdminAppointmentService : IAdminAppointmentService
             return new Error[] { new Error("User.Error", "This physician is not registered") };
         }
 
-        var query = _repository.GetAll<Appointment>()
+        var appointments = await _repository.GetAll<Appointment>()
             .Where(c => c.PhysicianId == physicianUserId)
             .OrderByDescending(c => c.Date)
-            .AsQueryable(); 
-        
-        var appointments = query
-            .Select(r => new
-            {
-                r.Patient.User.FirstName,
-                r.Patient.User.LastName,
-                r.Patient.User.Email,
-                r.Patient.User.ImageUrl,
-                r.Patient.Height,
-                r.Patient.Weight,
-                r.Patient.BloodGroup,
-                r.Patient.PrimaryPhysicanName,
-                r.Date,
-                CurrentMedication = r.Patient.Medications
-                    .Select(m => new PatientMedication
-                    (
-                        m.Dosage,
-                        m.Name,
-                        m.Frequency
-                    ))
-                    .ToList(),
-                MedicalConditions = r.Patient.MedicalDetails
-                    .Where(md => md.MedicalDetailsType == MedicalDetailsType.MedicalCondition)
-                    .Select(md => md.MedicalDetailsType)
-                    .ToList(),
-                Allergies = r.Patient.MedicalDetails
-                    .Where(md => md.MedicalDetailsType == MedicalDetailsType.Allergy)
-                    .Select(md => md.MedicalDetailsType)
-                    .ToList()
-            })
-            .Paginate(paginationFilter);
+            .AsQueryable()
+            .Select(r => new GetPhysicianAppointmentsByDateDto
+    {
+        FirstName = r.Patient.User.FirstName,
+        LastName = r.Patient.User.LastName,
+        Email = r.Patient.User.Email,
+        ImageUrl = r.Patient.User.ImageUrl,
+        Height = r.Patient.Height,
+        Weight = r.Patient.Weight,
+        BloodType = r.Patient.BloodGroup,
+        PhysicianName = r.Patient.PrimaryPhysicanName,
+        Date = r.Date,
+        CurrentMedication = r.Patient.Medications
+            .Select(m => new PatientMedication
+            (
+                m.Dosage,
+                m.Name,
+                m.Frequency
+            ))
+            .ToList(),
+        MedicalConditions = r.Patient.MedicalDetails
+            .Where(md => md.MedicalDetailsType == MedicalDetailsType.MedicalCondition)
+            .Select(md => md.MedicalDetailsType)
+            .ToList(),
+        Allergies = r.Patient.MedicalDetails
+            .Where(md => md.MedicalDetailsType == MedicalDetailsType.Allergy)
+            .Select(md => md.MedicalDetailsType)
+            .ToList()
+    })
+    .Paginate(paginationFilter);
 
-        return Result.Success(appointments);
+        return appointments;
     }
 }

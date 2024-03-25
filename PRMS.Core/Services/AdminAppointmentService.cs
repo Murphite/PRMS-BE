@@ -127,7 +127,7 @@ public class AdminAppointmentService : IAdminAppointmentService
 
         return monthlyAppointments;
     }
-}
+
     public async Task<Result<PaginatorDto<IEnumerable<GetPhysicianAppointmentsByDateDto>>>> GetAllPhysicianAppointmentsSortedByDate(string physicianUserId, PaginationFilter paginationFilter)
     {
         var physician = await _userManager.FindByIdAsync(physicianUserId);

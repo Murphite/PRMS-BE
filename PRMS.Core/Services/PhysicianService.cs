@@ -83,4 +83,31 @@ public class PhysicianService : IPhysicianService
 
         return Result.Success(paginatedPhysicans);
     }
+
+    public async Task<Result<PaginatorDto<IEnumerable<PhysicianPrescriptionsDto>>>> FetchPhysicianPrescriptions(string physicianUserId, PaginationFilter paginationFilter)
+    {
+		var physicianId = await _repository.GetAll<Physician>()
+			.Where(p => p.UserId == physicianUserId)
+            .Select(p=>p.Id)
+			.FirstOrDefaultAsync();
+
+        var physicianPrescriptions =  await _repository.GetAll<Medication>()
+             .Include(m => m.Prescription)
+             .Where(m => m.Prescription.PhysicianId == physicianId)
+             .Include(m => m.Patient)
+             .ThenInclude(m => m.User)
+             .Select(m => new PhysicianPrescriptionsDto
+             {
+                 MedicationId = m.Id,
+                 PrescriptionId = m.PrescriptionId,
+                 Date = m.CreatedAt.ToString("MMMM dd,yyyy"),
+                 PatientName = $"{m.Patient.User.FirstName} {m.Patient.User.LastName}",
+                 MedicationName = m.Name,
+                 Dosage = m.Dosage,
+                 Instructions = m.Instruction,
+                 MedicationStatus=m.MedicationStatus.ToString(),
+             }).Paginate(paginationFilter);
+
+        return physicianPrescriptions;
+	}
 }

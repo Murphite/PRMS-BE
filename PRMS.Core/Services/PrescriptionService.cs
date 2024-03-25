@@ -66,7 +66,7 @@ public class PrescriptionService : IPrescriptionService
     public async Task<Result> UpdatePrescription(string medicationId, MedicationStatus medicationStatus)
     {
 
-        var medication = await _repository.GetAll<Medication>().SingleOrDefaultAsync(x => x.Id == medicationId);
+        var medication = await _repository.GetAll<Medication>().FirstOrDefaultAsync(x => x.Id == medicationId);
 
         if (medication == null)
         {

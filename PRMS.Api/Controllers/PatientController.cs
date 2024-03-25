@@ -5,7 +5,6 @@ using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Entities;
-using PRMS.Domain.Enums;
 
 namespace PRMS.Api.Controllers;
 
@@ -18,7 +17,8 @@ public class PatientController : ControllerBase
     private readonly UserManager<User> _userManager;
     private readonly IPrescriptionService _prescriptionService;
 
-    public PatientController(IPatientService patientService, UserManager<User> userManager,IPrescriptionService prescriptionService)
+    public PatientController(IPatientService patientService, UserManager<User> userManager, IPrescriptionService prescriptionService)
+
     {
         _patientService = patientService;
         _userManager = userManager;
@@ -72,6 +72,20 @@ public class PatientController : ControllerBase
     {
         var result = await _patientService.GetNewPatientsCount();
 
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success(result));
+    }
+
+    [HttpGet("medications")]
+    public async Task<IActionResult> GetPatientPrescribedMedicationHistory([FromQuery] PaginationFilter? paginationFilter = null)
+    {
+        paginationFilter ??= new PaginationFilter();
+
+        var patientUserId = _userManager.GetUserId(User);
+
+        var result = await _prescriptionService.GetPatiencePrescribedMedicationHistory(patientUserId!, paginationFilter);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 

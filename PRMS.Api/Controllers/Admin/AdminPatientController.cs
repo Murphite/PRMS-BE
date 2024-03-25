@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Api.Extensions;
 using PRMS.Core.Abstractions;
@@ -22,9 +21,8 @@ public class AdminPatientController : ControllerBase
     {
         _adminPatientService = adminPatientService;
         _prescriptionService = prescriptionService;
-       
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetPatientList([FromRoute] string patientUserId)
     {
@@ -34,7 +32,7 @@ public class AdminPatientController : ControllerBase
 
         return Ok(ResponseDto<PatientDetailsDto>.Success(result.Data));
     }
-    
+
     [HttpGet("{patientUserId}")]
     public async Task<IActionResult> GetPatientDetails([FromRoute] string patientUserId)
     {
@@ -82,6 +80,18 @@ public class AdminPatientController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
 
+    [HttpGet("{patientUserId}/medications")]
+    public async Task<IActionResult> GetPatientPrescribedMedicationHistory([FromRoute] string patientUserId, [FromQuery] PaginationFilter? paginationFilter = null)
+    {
+        paginationFilter ??= new PaginationFilter();
+
+        var result = await _prescriptionService.GetPatiencePrescribedMedicationHistory(patientUserId, paginationFilter);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success(result));
+    }
+
 	[HttpPut("{medicationId}/update-medication-status")]
 	public async Task<IActionResult> UpdateMedicationStatus([FromRoute] string medicationId, MedicationStatus medicationStatus)
 	{
@@ -92,4 +102,5 @@ public class AdminPatientController : ControllerBase
 		return Ok(ResponseDto<object>.Success(result));
 
 	}
+
 }

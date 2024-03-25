@@ -89,7 +89,7 @@ public class PrescriptionService : IPrescriptionService
                 Dosage = m.Dosage,
                 Date = m.CreatedAt.ToString("MMMM dd, yyyy"),
                 Instruction = m.Instruction,
-                //Status = m.MedicationStatus.ToString(),
+                Status = m.MedicationStatus.ToString(),
             }).Paginate(paginationFilter);
         return Result.Success(patientPrescribedMedicationHistory);
     }

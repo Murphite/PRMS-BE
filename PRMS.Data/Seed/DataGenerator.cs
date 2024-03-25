@@ -160,7 +160,6 @@ public class DataGenerator
         var categories = new Faker().PickRandom(_categories, 2).ToList();
         medicalCenter.MedicalCenterCategories = categories;
         await _context.MedicalCenters.AddAsync(medicalCenter);
-        // await _context.MedicalCenters.AddRangeAsync(pivot);
 
         return medicalCenter;
     }
@@ -168,12 +167,13 @@ public class DataGenerator
     private async Task GeneratePhysicians(int count)
     {
         var users = await GenerateUsers(count);
+        var faker = new Faker();
 
         foreach (var user in users)
         {
             var medicalCenter = await GenerateMedicalCenter();
 
-            var physicians = new Faker<Physician>()
+            var physician = new Faker<Physician>()
                 .RuleFor(p => p.UserId, user.Id)
                 .RuleFor(p => p.MedicalCenterId, medicalCenter.Id)
                 .RuleFor(p => p.Title, f => f.PickRandom(new[] { "Dr", "Nurse", "Pharm" }))
@@ -183,10 +183,13 @@ public class DataGenerator
                 .RuleFor(p => p.About, f => f.Lorem.Paragraphs(3))
                 .RuleFor(p => p.WorkingTime, "Monday-Friday, 8am-6pm")
                 .RuleFor(p => p.YearsOfExperience, f => f.Random.Int(2, 30))
-                .Generate(2);
+                .Generate();
 
-            _physicians.AddRange(physicians);
-            await _context.Physicians.AddRangeAsync(physicians);
+            _physicians.Add(physician);
+            var appointments = GenerateAppointments(faker.PickRandom(_patients).Id, physician.Id, 15);
+            
+            await _context.Physicians.AddAsync(physician);
+            await _context.Appointments.AddRangeAsync(appointments);
         }
     }
 
@@ -221,5 +224,16 @@ public class DataGenerator
 
             await GenerateMedications(patient.Id, prescription.Id, 2);
         }
+    }
+
+    private static IEnumerable<Appointment> GenerateAppointments(string patientId, string physicianId, int count)
+    {
+        return new Faker<Appointment>()
+            .RuleFor(a => a.PatientId, patientId)
+            .RuleFor(a => a.PhysicianId, physicianId)
+            .RuleFor(a => a.Date, f => f.Date.FutureOffset().ToUniversalTime())
+            .RuleFor(a => a.Reason, f => f.Lorem.Sentence())
+            .RuleFor(a => a.Status, f => f.PickRandom<AppointmentStatus>())
+            .Generate(count);
     }
 }

@@ -4,6 +4,7 @@ using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Core.Utilities;
 using PRMS.Domain.Entities;
+using PRMS.Domain.Enums;
 
 namespace PRMS.Core.Services;
 
@@ -92,5 +93,23 @@ public class PrescriptionService : IPrescriptionService
                 Status = m.MedicationStatus.ToString(),
             }).Paginate(paginationFilter);
         return Result.Success(patientPrescribedMedicationHistory);
+    }
+
+    public async Task<Result> UpdatePrescription(string medicationId, MedicationStatus medicationStatus)
+    {
+
+        var medication = await _repository.GetAll<Medication>().FirstOrDefaultAsync(x => x.Id == medicationId);
+
+        if (medication == null)
+        {
+            return new Error[] { new("Medication.Error", "No Medication") };
+        }
+
+        medication.MedicationStatus = medicationStatus;
+
+        _repository.Update(medication);
+        await _unitOfWork.SaveChangesAsync();
+        return Result.Success("Medication Status Updated Successfully");
+
     }
 }

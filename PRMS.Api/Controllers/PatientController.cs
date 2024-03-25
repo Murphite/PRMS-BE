@@ -18,6 +18,7 @@ public class PatientController : ControllerBase
     private readonly IPrescriptionService _prescriptionService;
 
     public PatientController(IPatientService patientService, UserManager<User> userManager, IPrescriptionService prescriptionService)
+
     {
         _patientService = patientService;
         _userManager = userManager;
@@ -90,4 +91,14 @@ public class PatientController : ControllerBase
 
         return Ok(ResponseDto<object>.Success(result));
     }
+
+    [HttpPut("{medicationId}/update-medication-status")]
+    public async Task<IActionResult> UpdateMedicationStatus([FromRoute] string medicationId, MedicationStatus medicationStatus)
+    {
+        var result= await _prescriptionService.UpdatePrescription(medicationId, medicationStatus);
+		if (result.IsFailure)
+			return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+		return Ok(ResponseDto<object>.Success(result));
+	}
 }

@@ -5,6 +5,7 @@ using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Domain.Entities;
+using PRMS.Domain.Enums;
 
 namespace PRMS.Api.Controllers;
 
@@ -92,13 +93,23 @@ public class PatientController : ControllerBase
         return Ok(ResponseDto<object>.Success(result));
     }
 
+    [HttpGet("medications/{medicationId}")]
+    public async Task<IActionResult> GetPatientPrescribedMedicationHistory([FromRoute] string medicationId)
+    {
+        var result = await _prescriptionService.GetPrescribedMedicationHistoryById(medicationId);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success(result));
+    }
+
     [HttpPut("{medicationId}/update-medication-status")]
     public async Task<IActionResult> UpdateMedicationStatus([FromRoute] string medicationId, MedicationStatus medicationStatus)
     {
-        var result= await _prescriptionService.UpdatePrescription(medicationId, medicationStatus);
-		if (result.IsFailure)
-			return BadRequest(ResponseDto<object>.Failure(result.Errors));
+        var result = await _prescriptionService.UpdatePrescription(medicationId, medicationStatus);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-		return Ok(ResponseDto<object>.Success(result));
-	}
+        return Ok(ResponseDto<object>.Success(result));
+    }
 }

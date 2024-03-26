@@ -95,6 +95,33 @@ public class PrescriptionService : IPrescriptionService
         return Result.Success(patientPrescribedMedicationHistory);
     }
 
+    public async Task<Result<PrescribedMedicationDto>> GetPrescribedMedicationHistoryById(string medicationId)
+    {
+        if (string.IsNullOrEmpty(medicationId))
+        {
+            return new Error[] { new("Patient.Error", "Patient not found") };
+        }
+
+        var medication = await _repository.GetAll<Medication>()
+            .FirstOrDefaultAsync(x => x.Id == medicationId);
+
+        if (medication == null)
+        {
+            return new Error[] { new("Patient.Error", "Patient not found") };
+        }
+
+        var medicationHistoryDto = new PrescribedMedicationDto
+        {
+            PhysicianName = medication.Prescription?.Physician.Title + " " + medication.Prescription?.Physician?.User.FirstName + " " + medication.Prescription?.Physician?.User.LastName,
+            Frequency = medication.Frequency,
+            MedicationName = medication.Name,
+            Dosage = medication.Dosage,
+            Duration = medication.Duration,
+            Instruction = medication.Instruction,
+        };
+
+        return Result.Success(medicationHistoryDto);
+    }
     public async Task<Result> UpdatePrescription(string medicationId, MedicationStatus medicationStatus)
     {
 

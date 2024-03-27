@@ -96,7 +96,7 @@ public class PatientController : ControllerBase
     [HttpPut("{medicationId}/update-medication-status")]
     public async Task<IActionResult> UpdateMedicationStatus([FromRoute] string medicationId, MedicationStatus medicationStatus)
     {
-        var result= await _prescriptionService.UpdatePrescription(medicationId, medicationStatus);
+        var result= await _prescriptionService.UpdateMedicationStatus(medicationId, medicationStatus);
 		if (result.IsFailure)
 			return BadRequest(ResponseDto<object>.Failure(result.Errors));
 

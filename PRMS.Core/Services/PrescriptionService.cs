@@ -19,7 +19,8 @@ public class PrescriptionService : IPrescriptionService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result> CreatePrescription(string patientUserId, string physicianUserId, CreatePrescriptionDto prescriptionDto)
+    public async Task<Result> CreatePrescription(string patientUserId, string physicianUserId,
+        CreatePrescriptionDto prescriptionDto)
     {
         var patientId = await _repository.GetAll<Patient>()
             .Where(p => p.UserId == patientUserId)
@@ -65,39 +66,34 @@ public class PrescriptionService : IPrescriptionService
         return Result.Success();
     }
 
-    public async Task<Result<PaginatorDto<IEnumerable<PrescribedMedicationDto>>>> GetPatiencePrescribedMedicationHistory(string patientUserId, PaginationFilter paginationFilter)
+    public async Task<Result<PaginatorDto<IEnumerable<PrescribedMedicationDto>>>>
+        GetPatiencePrescribedMedicationHistory(string patientUserId, PaginationFilter paginationFilter)
     {
-        if (patientUserId.IsNullOrEmpty())
-        {
-            return new Error[] { new("Patient.Error", "Patient is Invalid") };
-        }
         var patient = await _repository.GetAll<Patient>()
             .FirstOrDefaultAsync(x => x.UserId == patientUserId);
         if (patient == null)
         {
-
             return new Error[] { new("Patient.Error", "Patient not found") };
-
         }
+
         var patientPrescribedMedicationHistory = await _repository
             .GetAll<Medication>()
             .Where(x => x.PatientId == patient.Id)
             .OrderByDescending(x => x.CreatedAt)
             .Select(m => new PrescribedMedicationDto
             {
-                PhysicianName = m.Prescription.Physician.Title + " " + m.Prescription.Physician.User.FirstName + " " + m.Prescription.Physician.User.LastName,
                 MedicationName = m.Name,
                 Dosage = m.Dosage,
                 Date = m.CreatedAt.ToString("MMMM dd, yyyy"),
                 Instruction = m.Instruction,
                 Status = m.MedicationStatus.ToString(),
             }).Paginate(paginationFilter);
+        
         return Result.Success(patientPrescribedMedicationHistory);
     }
 
-    public async Task<Result> UpdatePrescription(string medicationId, MedicationStatus medicationStatus)
+    public async Task<Result> UpdateMedicationStatus(string medicationId, MedicationStatus medicationStatus)
     {
-
         var medication = await _repository.GetAll<Medication>().FirstOrDefaultAsync(x => x.Id == medicationId);
 
         if (medication == null)
@@ -110,6 +106,5 @@ public class PrescriptionService : IPrescriptionService
         _repository.Update(medication);
         await _unitOfWork.SaveChangesAsync();
         return Result.Success("Medication Status Updated Successfully");
-
     }
 }

@@ -196,7 +196,7 @@ public class AdminPatientService : IAdminPatientService
 
         if (appointment == null)
         {
-            return new Error[] { new Error("Appointment.Error", "No Appointment") };
+            return new Error[] { new("Appointment.Error", "No Appointment") };
         }
 
         appointment.Status = status;

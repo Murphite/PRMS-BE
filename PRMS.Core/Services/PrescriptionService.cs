@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
@@ -11,11 +12,13 @@ namespace PRMS.Core.Services;
 public class PrescriptionService : IPrescriptionService
 {
     private readonly IRepository _repository;
+    private readonly UserManager<User> _userManager;
     private readonly IUnitOfWork _unitOfWork;
 
-    public PrescriptionService(IRepository repository, IUnitOfWork unitOfWork)
+    public PrescriptionService(IRepository repository, UserManager<User> userManager, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _userManager = userManager;
         _unitOfWork = unitOfWork;
     }
 
@@ -107,4 +110,25 @@ public class PrescriptionService : IPrescriptionService
         await _unitOfWork.SaveChangesAsync();
         return Result.Success("Medication Status Updated Successfully");
     }
+
+    // public async Task<Result<PaginatorDto<IEnumerable<PrescriptionsDto>>>> FetchPrescriptionHistory(
+    //     string physicianUserId, PaginationFilter paginationFilter)
+    // {
+    //     var prescriptions = await _repository.GetAll<Prescription>()
+    //         .Where(p => p.PhysicianId == physicianUserId)
+    //         .Include(p => p.Medications)
+    //         .Select(p => new PrescriptionsDto
+    //         {
+    //             MedicationId = p.Me,
+    //             Date = p.CreatedAt.ToString("MMMM dd,yyyy"),
+    //             PatientName = $"{p.Patient.User.FirstName} {p.Patient.User.LastName}",
+    //             MedicationName = p.Name,
+    //             Dosage = p.Dosage,
+    //             Instructions = p.Instruction,
+    //             MedicationStatus = p.MedicationStatus.ToString(),
+    //         })
+    //         .Paginate(paginationFilter);
+    //
+    //     return physicianPrescriptions;
+    // }
 }

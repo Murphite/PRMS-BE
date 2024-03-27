@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace PRMS.Core.Dtos
 {
-	public class PhysicianPrescriptionsDto
+	public class PrescriptionsDto
 	{
 		public string MedicationId { get; set; }
-		public string PrescriptionId { get; set; }
 		public string Date { get; set; }
 		public string PatientName { get; set; }
 		public string MedicationName { get; set; }

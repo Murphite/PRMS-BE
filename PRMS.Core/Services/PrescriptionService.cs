@@ -112,6 +112,7 @@ public class PrescriptionService : IPrescriptionService
 
         var medicationHistoryDto = new PrescribedMedicationDto
         {
+            Id = medication.Id,
             PhysicianName = medication.Prescription?.Physician.Title + " " + medication.Prescription?.Physician?.User.FirstName + " " + medication.Prescription?.Physician?.User.LastName,
             Frequency = medication.Frequency,
             MedicationName = medication.Name,

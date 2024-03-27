@@ -99,7 +99,7 @@ public class PrescriptionService : IPrescriptionService
     {
         if (string.IsNullOrEmpty(medicationId))
         {
-            return new Error[] { new("Patient.Error", "Patient not found") };
+            return new Error[] { new("Medication.Error", "Medication not found") };
         }
 
         var medication = await _repository.GetAll<Medication>()
@@ -107,7 +107,7 @@ public class PrescriptionService : IPrescriptionService
 
         if (medication == null)
         {
-            return new Error[] { new("Patient.Error", "Patient not found") };
+            return new Error[] { new("Medication.Error", "Medication not found") };
         }
 
         var medicationHistoryDto = new PrescribedMedicationDto

@@ -6,7 +6,7 @@ namespace PRMS.Core.Utilities;
 public static class Pagination
 {
     public static async Task<PaginatorDto<IEnumerable<TSource>>> Paginate<TSource>(this IQueryable<TSource> queryable,
-        PaginationFilter? paginationFilter = null)
+        PaginationFilter paginationFilter)
         where TSource : class
     {
         var count = await queryable.CountAsync();

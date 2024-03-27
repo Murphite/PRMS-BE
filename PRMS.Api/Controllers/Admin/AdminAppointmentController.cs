@@ -25,7 +25,8 @@ public class AdminAppointmentController : ControllerBase
     }
 
     [HttpGet("patient-appointment")]
-    public async Task<IActionResult> GetPatientAppointments([FromQuery] string? status = null, PaginationFilter? paginationFilter = null)
+    public async Task<IActionResult> GetPatientAppointments([FromQuery] string? status = null,
+        PaginationFilter? paginationFilter = null)
     {
         paginationFilter ??= new PaginationFilter();
         var physicianUserId = _userManager.GetUserId(User);
@@ -34,35 +35,39 @@ public class AdminAppointmentController : ControllerBase
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        return Ok(ResponseDto<object>.Success());
+        return Ok(ResponseDto<object>.Success(result.Data));
     }
+
     [HttpGet("physician-ranged-appointments")]
     public async Task<IActionResult> GetAllPhysicianRangedAppointments()
     {
         var physicianUserId = _userManager.GetUserId(User);
-        var result = await _adminAppointmentService.GetAllPhysicianRangedAppointments(physicianUserId!);
+        var result = await _adminAppointmentService.GetCurrentMonthAppointment(physicianUserId!);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        return Ok(ResponseDto<object>.Success());
+        return Ok(ResponseDto<object>.Success(result.Data));
     }
 
     [HttpGet("monthly-appointments")]
-    public async Task<IActionResult> GetMonthlyAppointmentsForYear(string physicianId, PaginationFilter? paginationFilter, string status, int year)
+    public async Task<IActionResult> GetMonthlyAppointmentsForYear(string? status, int year)
     {
-        paginationFilter ??= new PaginationFilter();
-        var result = await _adminAppointmentService.GetMonthlyAppointmentsForYear(physicianId, status, year, paginationFilter );
+        var physicianUserId = _userManager.GetUserId(User);
+        var result =
+            await _adminAppointmentService.GetMonthlyAppointmentCountForYear(physicianUserId!, status, year);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
-            
+
         return Ok(ResponseDto<object>.Success(result.Data));
     }
-    
+
     [HttpGet("physician-date-appointments")]
-    public async Task<IActionResult> GetAllPhysicianAppointmentsSortedByDate(string physicianId, PaginationFilter? paginationFilter)
+    public async Task<IActionResult> GetAllPhysicianAppointmentsSortedByDate(PaginationFilter? paginationFilter)
     {
+        var physicianUserId = _userManager.GetUserId(User);
         paginationFilter ??= new PaginationFilter();
-        var result = await _adminAppointmentService.GetAllPhysicianAppointmentsSortedByDate(physicianId, paginationFilter);
+        var result =
+            await _adminAppointmentService.GetAllPhysicianAppointmentsSortedByDate(physicianUserId!, paginationFilter);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 

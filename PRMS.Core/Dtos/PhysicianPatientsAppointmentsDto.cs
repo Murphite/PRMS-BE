@@ -9,8 +9,8 @@ public record PhysicianPatientsAppointmentsDto(
     float PatientHeight,
     float PatientWeight,
     string? PrimaryPhysicanName,
-    List<string> Diagnosis,
-    List<PatientMedication> MedicationUsage
+    IEnumerable<string> Diagnosis,
+    IEnumerable<PatientMedication> MedicationUsage
 );
 
 public record PatientMedication(

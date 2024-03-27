@@ -67,7 +67,7 @@ public class PrescriptionService : IPrescriptionService
     }
 
     public async Task<Result<PaginatorDto<IEnumerable<PrescribedMedicationDto>>>>
-        GetPatiencePrescribedMedicationHistory(string patientUserId, PaginationFilter paginationFilter)
+        GetPatientPrescribedMedicationHistory(string patientUserId, PaginationFilter paginationFilter)
     {
         var patient = await _repository.GetAll<Patient>()
             .FirstOrDefaultAsync(x => x.UserId == patientUserId);

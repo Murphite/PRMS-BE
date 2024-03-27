@@ -88,7 +88,7 @@ public class AdminPatientController : ControllerBase
     {
         paginationFilter ??= new PaginationFilter();
 
-        var result = await _prescriptionService.GetPatiencePrescribedMedicationHistory(patientUserId, paginationFilter);
+        var result = await _prescriptionService.GetPatientPrescribedMedicationHistory(patientUserId, paginationFilter);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
@@ -105,4 +105,16 @@ public class AdminPatientController : ControllerBase
 
         return Ok(ResponseDto<object>.Success(result));
     }
+    
+    [HttpGet("new-patients-count")]
+    public async Task<IActionResult> GetNewPatientsCount()
+    {
+        var result = await _adminPatientService.GetNewPatientsCount();
+
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success(result));
+    }
+
 }

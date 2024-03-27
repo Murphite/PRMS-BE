@@ -18,7 +18,8 @@ public class PatientController : ControllerBase
     private readonly UserManager<User> _userManager;
     private readonly IPrescriptionService _prescriptionService;
 
-    public PatientController(IPatientService patientService, UserManager<User> userManager, IPrescriptionService prescriptionService)
+    public PatientController(IPatientService patientService, UserManager<User> userManager,
+        IPrescriptionService prescriptionService)
 
     {
         _patientService = patientService;
@@ -68,25 +69,15 @@ public class PatientController : ControllerBase
         return _userManager.GetUserId(User)!;
     }
 
-    [HttpGet("new-patients-count")]
-    public async Task<IActionResult> GetNewPatientsCount()
-    {
-        var result = await _patientService.GetNewPatientsCount();
-
-        if (result.IsFailure)
-            return BadRequest(ResponseDto<object>.Failure(result.Errors));
-
-        return Ok(ResponseDto<object>.Success(result));
-    }
-
     [HttpGet("medications")]
-    public async Task<IActionResult> GetPatientPrescribedMedicationHistory([FromQuery] PaginationFilter? paginationFilter = null)
+    public async Task<IActionResult> GetPatientPrescribedMedicationHistory(
+        [FromQuery] PaginationFilter? paginationFilter = null)
     {
         paginationFilter ??= new PaginationFilter();
 
         var patientUserId = _userManager.GetUserId(User);
 
-        var result = await _prescriptionService.GetPatiencePrescribedMedicationHistory(patientUserId!, paginationFilter);
+        var result = await _prescriptionService.GetPatientPrescribedMedicationHistory(patientUserId!, paginationFilter);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
@@ -94,12 +85,13 @@ public class PatientController : ControllerBase
     }
 
     [HttpPut("{medicationId}/update-medication-status")]
-    public async Task<IActionResult> UpdateMedicationStatus([FromRoute] string medicationId, MedicationStatus medicationStatus)
+    public async Task<IActionResult> UpdateMedicationStatus([FromRoute] string medicationId,
+        [FromBody] MedicationStatus medicationStatus)
     {
-        var result= await _prescriptionService.UpdateMedicationStatus(medicationId, medicationStatus);
-		if (result.IsFailure)
-			return BadRequest(ResponseDto<object>.Failure(result.Errors));
+        var result = await _prescriptionService.UpdateMedicationStatus(medicationId, medicationStatus);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-		return Ok(ResponseDto<object>.Success(result));
-	}
+        return Ok(ResponseDto<object>.Success(result));
+    }
 }

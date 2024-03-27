@@ -10,4 +10,10 @@ public interface IAdminPatientService
     Task<Result> UpdateAdminAppointmentStatus(string userId, AppointmentStatus status);
     public Task<Result<PatientDetailsDto>> GetPatientDetails(string patientUserId);
     Task<Result<PaginatorDto<IEnumerable<PatientDto>>>>  GetListOfPatients(PaginationFilter paginationFilter);
+    public Task<Result<Integer>> GetNewPatientsCount();
+}
+
+public class Integer
+{
+    public int Data { get; set; }
 }

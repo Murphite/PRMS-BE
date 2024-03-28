@@ -19,33 +19,48 @@ public class AdminAppointmentService : IAdminAppointmentService
         _repository = repository;
     }
 
-    public async Task<Result> GetAllPhysicianRangedAppointments(string physicianUserId)
+    public async Task<Result<IEnumerable<PhysicianRangedAppointmentDto>>> GetCurrentMonthAppointment(
+        string physicianUserId)
     {
-        var physician = await _userManager.FindByIdAsync(physicianUserId);
-        if (physician == null)
+        var user = await _userManager.FindByIdAsync(physicianUserId);
+        if (user == null)
         {
-            return new Error[] { new("User.Error", "This physician is not registered") };
+            return new Error[] { new("User.Error", "User not found") };
         }
-        DateTime currentDate = DateTime.Today;
 
-        DateTime firstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1); //first day of the current month             
+        var physicianId = await _repository.GetAll<Physician>()
+            .Where(p => p.UserId == physicianUserId)
+            .Select(p => p.Id)
+            .FirstOrDefaultAsync();
 
-        DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1); //last day of the current month
-        var appointments = _repository.GetAll<Appointment>()
-            .Where(c => c.PhysicianId == physicianUserId && c.Date >= firstDayOfMonth && c.Date <= lastDayOfMonth)
+        if (physicianId is null)
+        {
+            return new Error[] { new("Physician.Error", "Physician not found") };
+        }
+
+        var currentDate = DateTime.Today;
+        var firstDayOfMonth =
+            new DateTime(currentDate.Year, currentDate.Month, 1); //first day of the current month             
+        var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1); //last day of the current month
+
+        var appointments = await _repository.GetAll<Appointment>()
+            .Where(c => c.PhysicianId == physicianId && c.Date >= firstDayOfMonth && c.Date <= lastDayOfMonth)
             .Include(c => c.Patient)
-            .OrderByDescending(c => c.Date)
             .Select(r => new PhysicianRangedAppointmentDto
             {
                 FirstName = r.Patient.User.FirstName,
                 LastName = r.Patient.User.LastName,
                 ImageUrl = r.Patient.User.ImageUrl,
                 Date = r.Date
-            });
-        return Result.Success(appointments);
+            })
+            .ToListAsync();
+
+        return appointments;
     }
 
-    public async Task<Result> GetPatientAppointments(string physicianUserId, string? status,
+    // Todo: This method needs clarification
+    public async Task<Result<PaginatorDto<IEnumerable<PhysicianPatientsAppointmentsDto>>>> GetPatientAppointments(
+        string physicianUserId, string? status,
         PaginationFilter paginationFilter)
     {
         var physicianUser = await _userManager.FindByIdAsync(physicianUserId);
@@ -58,117 +73,127 @@ public class AdminAppointmentService : IAdminAppointmentService
         var physicianId = await _repository.GetAll<Physician>()
             .Where(x => x.UserId == physicianUser.Id)
             .Select(x => x.Id)
-            .FirstAsync();
+            .FirstOrDefaultAsync();
+
+        if (physicianId is null)
+        {
+            return new Error[] { new("Physician.Error", "Physician not found") };
+        }
 
         var physicianAppointments = _repository.GetAll<Appointment>()
-            .Where(p => p.PhysicianId == physicianId && p.Date >= DateTime.Now && p.Status == AppointmentStatus.Pending)
+            .Where(p => p.PhysicianId == physicianId && p.Date >= DateTimeOffset.Now && p.Status == AppointmentStatus.Pending)
             .OrderByDescending(p => p.Date)
-            .Include(p => p.Patient.MedicalDetails)
             .Include(p => p.Patient.Medications)
             .Include(p => p.Patient.Prescriptions)
             .Include(p => p.Patient.User);
 
-        var appointmentToReturn = physicianAppointments.Select(p => new PhysicianPatientsAppointmentsDto(
-            $"{p.Patient.User.FirstName} {p.Patient.User.LastName}",
-            p.Patient.User.Email,
-            p.Patient.User.ImageUrl,
-            p.Date,
-            p.Patient.BloodGroup.ToString(),
-            p.Patient.Height,
-            p.Patient.Weight,
-            p.Patient.PrimaryPhysicanName,
-            p.Patient.Prescriptions.Select(x => x.Diagnosis).ToList(),
-            p.Patient.Medications.Select(m => new PatientMedication(
-                m.Dosage,
-                m.Name,
-                m.Frequency
-            )).ToList()
-        )).Paginate(paginationFilter);
+        var appointmentToReturn = await physicianAppointments
+            .Select(p => new PhysicianPatientsAppointmentsDto(
+                $"{p.Patient.User.FirstName} {p.Patient.User.LastName}",
+                p.Patient.User.Email!,
+                p.Patient.User.ImageUrl,
+                p.Date,
+                p.Patient.BloodGroup.ToString(),
+                p.Patient.Height,
+                p.Patient.Weight,
+                p.Patient.PrimaryPhysicanName,
+                p.Patient.Prescriptions.Select(x => x.Diagnosis),
+                p.Patient.Medications.Select(m => new PatientMedication(
+                    m.Dosage,
+                    m.Name,
+                    m.Frequency
+                ))
+            )).Paginate(paginationFilter);
 
         return Result.Success(appointmentToReturn);
     }
 
-    public async Task<Result<PaginatorDto<IEnumerable<MonthlyAppointmentsDto>>>> GetMonthlyAppointmentsForYear(string physicianUserId,string status, int year, PaginationFilter paginationFilter)
+    public async Task<Result<IEnumerable<MonthlyAppointmentsDto>>> GetMonthlyAppointmentCountForYear(
+        string physicianUserId, string? status, int year)
     {
-
-        var physician = await _userManager.FindByIdAsync(physicianUserId);
-        if (physician == null)
+        var user = await _userManager.FindByIdAsync(physicianUserId);
+        if (user == null)
         {
-            return new Error[] { new("User.Error", "This physician is not registered") };
+            return new Error[] { new("User.Error", "User not found") };
         }
 
-        // Parse the status string to the AppointmentStatus enum
-            if (!Enum.TryParse(status, out AppointmentStatus appointmentStatus))
+        var physicianId = await _repository.GetAll<Physician>()
+            .Where(x => x.UserId == user.Id)
+            .Select(x => x.Id)
+            .FirstOrDefaultAsync();
+
+        if (physicianId is null)
         {
-            return new Error[] { new Error("Status.Error", "Invalid status value") };
+            return new Error[] { new("Physician.Error", "Physician not found") };
         }
 
-        var monthlyAppointments = await _repository.GetAll<Appointment>()
-        .Where(a => a.Date.Year == year && a.Status == appointmentStatus)
-        .Include(a => a.Patient.User)
-        .Select(a => new
+        var query = _repository.GetAll<Appointment>()
+            .Where(a => a.PhysicianId == physicianId && a.Date.Year == year);
+        
+        if (Enum.TryParse(status, out AppointmentStatus appointmentStatus))
         {
-            a.Date.Month,
-            a.Date,
-            PatientName = $"{a.Patient.User.FirstName} {a.Patient.User.LastName}",
-            a.Status,
-            a.Patient.User.ImageUrl
-        })
-        .AsQueryable()
-        .GroupBy(a => a.Month)
-        .Select(g => new MonthlyAppointmentsDto
-        {
-            Month = g.Key,
-            Date = g.FirstOrDefault().Date,
-            PatientName = g.FirstOrDefault().PatientName,
-            Status = g.FirstOrDefault().Status,
-            ImageUrl = g.FirstOrDefault().ImageUrl
-        }).Paginate(paginationFilter);
+            query = query.Where(a => a.Status == appointmentStatus);
+        }
+
+        var monthlyAppointments = await query
+            .GroupBy(a => a.Date.Month)
+            .Select(a => new MonthlyAppointmentsDto
+            {
+                Date = a.Key,
+                AppointmentCount = a.Count(),
+            })
+            .ToListAsync();
 
         return monthlyAppointments;
     }
 
-    public async Task<Result<PaginatorDto<IEnumerable<GetPhysicianAppointmentsByDateDto>>>> GetAllPhysicianAppointmentsSortedByDate(string physicianUserId, PaginationFilter paginationFilter)
+    public async Task<Result<PaginatorDto<IEnumerable<GetPhysicianAppointmentsByDateDto>>>>
+        GetAllPhysicianAppointmentsSortedByDate(string physicianUserId, PaginationFilter paginationFilter)
     {
-        var physician = await _userManager.FindByIdAsync(physicianUserId);
-        if (physician == null)
+        var user = await _userManager.FindByIdAsync(physicianUserId);
+        if (user == null)
         {
-            return new Error[] { new Error("User.Error", "This physician is not registered") };
+            return new Error[] { new("User.Error", "User not found") };
         }
-
+        
+        var physicianId = await _repository.GetAll<Physician>()
+            .Where(p => p.UserId == physicianUserId)
+            .Select(p => p.Id)
+            .FirstOrDefaultAsync();
+        if (physicianId is null)
+        {
+            return new Error[] { new("Physician.Error", "Physician not found") };
+        }
+        
         var appointments = await _repository.GetAll<Appointment>()
-            .Where(c => c.PhysicianId == physicianUserId)
+            .Where(c => c.PhysicianId == physicianId)
             .OrderByDescending(c => c.Date)
-            .AsQueryable()
             .Select(r => new GetPhysicianAppointmentsByDateDto
-    {
-        FirstName = r.Patient.User.FirstName,
-        LastName = r.Patient.User.LastName,
-        Email = r.Patient.User.Email,
-        ImageUrl = r.Patient.User.ImageUrl,
-        Height = r.Patient.Height,
-        Weight = r.Patient.Weight,
-        BloodType = r.Patient.BloodGroup,
-        PhysicianName = r.Patient.PrimaryPhysicanName,
-        Date = r.Date,
-        CurrentMedication = r.Patient.Medications
-            .Select(m => new PatientMedication
-            (
-                m.Dosage,
-                m.Name,
-                m.Frequency
-            ))
-            .ToList(),
-        MedicalConditions = r.Patient.MedicalDetails
-            .Where(md => md.MedicalDetailsType == MedicalDetailsType.MedicalCondition)
-            .Select(md => md.MedicalDetailsType)
-            .ToList(),
-        Allergies = r.Patient.MedicalDetails
-            .Where(md => md.MedicalDetailsType == MedicalDetailsType.Allergy)
-            .Select(md => md.MedicalDetailsType)
-            .ToList()
-    })
-    .Paginate(paginationFilter);
+            {
+                FirstName = r.Patient.User.FirstName,
+                LastName = r.Patient.User.LastName,
+                Email = r.Patient.User.Email!,
+                ImageUrl = r.Patient.User.ImageUrl,
+                Height = r.Patient.Height,
+                Weight = r.Patient.Weight,
+                BloodType = r.Patient.BloodGroup,
+                PhysicianName = r.Patient.PrimaryPhysicanName,
+                Date = r.Date,
+                CurrentMedication = r.Patient.Medications
+                    .Select(m => new PatientMedication
+                    (
+                        m.Dosage,
+                        m.Name,
+                        m.Frequency
+                    )),
+                MedicalConditions = r.Patient.MedicalDetails
+                    .Where(md => md.MedicalDetailsType == MedicalDetailsType.MedicalCondition)
+                    .Select(md => md.MedicalDetailsType),
+                Allergies = r.Patient.MedicalDetails
+                    .Where(md => md.MedicalDetailsType == MedicalDetailsType.Allergy)
+                    .Select(md => md.MedicalDetailsType)
+            })
+            .Paginate(paginationFilter);
 
         return appointments;
     }

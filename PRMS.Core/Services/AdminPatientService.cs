@@ -196,7 +196,7 @@ public class AdminPatientService : IAdminPatientService
 
         if (appointment == null)
         {
-            return new Error[] { new Error("Appointment.Error", "No Appointment") };
+            return new Error[] { new("Appointment.Error", "No Appointment") };
         }
 
         appointment.Status = status;
@@ -204,5 +204,20 @@ public class AdminPatientService : IAdminPatientService
         _repository.Update(appointment);
         await _unitOfWork.SaveChangesAsync();
         return Result.Success();
+    }
+
+    public async Task<Result<Integer>> GetNewPatientsCount()
+    {
+        var endDate = DateTime.UtcNow;
+        var startDate = new DateTime(endDate.Year, endDate.Month, 1);
+
+        // Query the database for new patients within the past month
+        var newPatientsCount = await _repository
+            .GetAll<Patient>()
+            .CountAsync(p => p.CreatedAt >= startDate && p.CreatedAt <= endDate);
+
+        // Return the count of new patients
+        var result = new Integer { Data = newPatientsCount };
+        return Result.Success(result);
     }
 }

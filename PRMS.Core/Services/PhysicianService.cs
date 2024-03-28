@@ -41,12 +41,13 @@ public class PhysicianService : IPhysicianService
 
         return reviews;
     }
-    
+
     public async Task<Result<PhysicianDetailsDto>> GetDetails(string physicianId)
     {
         var result = await _repository.GetAll<Physician>()
-            .Where(p => p.Id == physicianId).ToListAsync();
-        
+            .Where(p => p.Id == physicianId)
+            .ToListAsync();
+
         var physician = await _repository.GetAll<Physician>()
             .Where(p => p.Id == physicianId)
             .Include(p => p.User)
@@ -62,52 +63,63 @@ public class PhysicianService : IPhysicianService
 
     public async Task<Result<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>> GetAll(PaginationFilter paginationFilter)
     {
-        var physicansQuery = _repository.GetAll<Physician>()
-            .Select(ms => new GetPhysiciansDTO
+        var physicians = await _repository.GetAll<Physician>()
+            .Include(physician => physician.Reviews)
+            .Include(physician => physician.MedicalCenter)
+            .Include(physician => physician.User)
+            .ThenInclude(user => user.Address)
+            .Select(physician => new GetPhysiciansDTO
             {
-                FirstName = ms.User.FirstName,
-                LastName = ms.User.LastName,
-                MiddleName = ms.User.MiddleName,
-                ImageUrl = ms.User.ImageUrl,
-                Title = ms.Title,
-                Speciality = ms.Speciality,
-                Street = ms.User.Address.Street,
-                City = ms.User.Address.City,
-                State = ms.User.Address.State,
-                MedicalCenterName = ms.MedicalCenter.Name,
-                ReviewCount = ms.Reviews.Count(),
-                Rating = (int)Math.Round(ms.Reviews.Average(r => r.Rating))
-            });
+                FirstName = physician.User.FirstName,
+                LastName = physician.User.LastName,
+                MiddleName = physician.User.MiddleName,
+                ImageUrl = physician.User.ImageUrl,
+                Title = physician.Title,
+                Speciality = physician.Speciality,
+                Street = physician.User.Address.Street,
+                City = physician.User.Address.City,
+                State = physician.User.Address.State,
+                MedicalCenterName = physician.MedicalCenter.Name,
+                ReviewCount = physician.Reviews.Count,
+                Rating = (int)Math.Round(physician.Reviews.Average(r => r.Rating))
+            })
+            .Paginate(paginationFilter);
 
-        var paginatedPhysicans = await physicansQuery.Paginate(paginationFilter);
-
-        return Result.Success(paginatedPhysicans);
+        return physicians;
     }
 
-    public async Task<Result<PaginatorDto<IEnumerable<PhysicianPrescriptionsDto>>>> FetchPhysicianPrescriptions(string physicianUserId, PaginationFilter paginationFilter)
+    public async Task<Result<PaginatorDto<IEnumerable<PrescriptionsDto>>>> FetchPrescriptions(
+        string userId, PaginationFilter paginationFilter)
     {
-		var physicianId = await _repository.GetAll<Physician>()
-			.Where(p => p.UserId == physicianUserId)
-            .Select(p=>p.Id)
-			.FirstOrDefaultAsync();
-
-        var physicianPrescriptions =  await _repository.GetAll<Medication>()
-             .Include(m => m.Prescription)
-             .Where(m => m.Prescription.PhysicianId == physicianId)
-             .Include(m => m.Patient)
-             .ThenInclude(m => m.User)
-             .Select(m => new PhysicianPrescriptionsDto
-             {
-                 MedicationId = m.Id,
-                 PrescriptionId = m.PrescriptionId,
-                 Date = m.CreatedAt.ToString("MMMM dd,yyyy"),
-                 PatientName = $"{m.Patient.User.FirstName} {m.Patient.User.LastName}",
-                 MedicationName = m.Name,
-                 Dosage = m.Dosage,
-                 Instructions = m.Instruction,
-                 MedicationStatus=m.MedicationStatus.ToString(),
-             }).Paginate(paginationFilter);
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return new Error[] { new("User.NotFound", "User not found") };
+        
+        var patientId = await _repository.GetAll<Patient>()
+            .Where(p => p.UserId == userId)
+            .Select(p => p.Id)
+            .FirstOrDefaultAsync();
+        
+        if (patientId is null)
+            return new Error[] { new("Patient.NotFound", "Patient not found") };
+        
+        var physicianPrescriptions = await _repository.GetAll<Medication>()
+            .Where(m => m.PatientId == patientId)
+            .Include(m => m.Prescription)
+            .Include(m => m.Patient)
+            .ThenInclude(m => m.User)
+            .Select(m => new PrescriptionsDto
+            {
+                MedicationId = m.Id,
+                Date = m.CreatedAt.ToString("MMMM dd,yyyy"),
+                PatientName = $"{m.Patient.User.FirstName} {m.Patient.User.LastName}",
+                MedicationName = m.Name,
+                Dosage = m.Dosage,
+                Instructions = m.Instruction,
+                MedicationStatus = m.MedicationStatus.ToString(),
+            })
+            .Paginate(paginationFilter);
 
         return physicianPrescriptions;
-	}
+    }
 }

@@ -12,5 +12,5 @@ public class Prescription : Entity, IAuditable
     
     public Patient Patient { get; set; }
     public Physician Physician { get; set; }
-    public ICollection<Medication> Medications { get; set; }
+    public ICollection<Medication> Medications { get; set; } = new List<Medication>();
 }

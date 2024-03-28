@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
-using PRMS.Core.Services;
 using PRMS.Domain.Entities;
-using System.Threading.Tasks;
 
 namespace PRMS.Api.Controllers;
 
@@ -16,9 +14,9 @@ namespace PRMS.Api.Controllers;
 public class PhysicianController : ControllerBase
 {
     private readonly IPhysicianService _physicianService;
-	private readonly UserManager<User> _userManager;
+    private readonly UserManager<User> _userManager;
 
-	public PhysicianController(IPhysicianService physicianService, UserManager<User> userManager)
+    public PhysicianController(IPhysicianService physicianService, UserManager<User> userManager)
     {
         _physicianService = physicianService;
         _userManager = userManager;
@@ -28,7 +26,7 @@ public class PhysicianController : ControllerBase
     public async Task<IActionResult> GetPhysicianDetails([FromRoute] string physicianId)
     {
         var result = await _physicianService.GetDetails(physicianId);
-        if(result.IsFailure)
+        if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
         return Ok(ResponseDto<object>.Success(result.Data));
@@ -39,36 +37,34 @@ public class PhysicianController : ControllerBase
     {
         paginationFilter ??= new PaginationFilter();
         var result = await _physicianService.GetReviews(physicianId, paginationFilter);
-        if(result.IsFailure)
+        if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
         return Ok(ResponseDto<object>.Success(result.Data));
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllMedicalPhysicians([FromQuery] PaginationFilter paginationFilter)
+    public async Task<IActionResult> GetAllMedicalPhysicians([FromQuery] PaginationFilter? paginationFilter)
     {
-        // Call the service method to retrieve all medical Physicians with pagination
+        paginationFilter ??= new PaginationFilter();
         var result = await _physicianService.GetAll(paginationFilter);
 
-        // Return error response if the operation failed
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        // Return the paginated list of medical Physicians
         return Ok(ResponseDto<object>.Success(result.Data));
     }
 
     [HttpGet("get-physician-prescriptions")]
-	public async Task<IActionResult> GetPhysicianPresciptions([FromQuery] PaginationFilter? paginationFilter=null)
-	{
-		paginationFilter ??= new PaginationFilter();
-        var physicianUserId = _userManager.GetUserId(User);
-        var result = await _physicianService.FetchPhysicianPrescriptions(physicianUserId!, paginationFilter);
+    public async Task<IActionResult> GetPhysicianPresciptions([FromQuery] PaginationFilter? paginationFilter = null)
+    {
+        paginationFilter ??= new PaginationFilter();
+        var userId = _userManager.GetUserId(User);
+        var result = await _physicianService.FetchPrescriptions(userId!, paginationFilter);
 
-		if (result.IsFailure)
-			return BadRequest(ResponseDto<object>.Failure(result.Errors));
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-		return Ok(ResponseDto<object>.Success(result.Data));
-	}
+        return Ok(ResponseDto<object>.Success(result.Data));
+    }
 }

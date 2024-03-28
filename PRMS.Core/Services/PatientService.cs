@@ -179,20 +179,4 @@ public class PatientService : IPatientService
         await _unitOfWork.SaveChangesAsync();
         return Result.Success();
     }
-
-    public async Task<Result<Integer>> GetNewPatientsCount()
-    {
-        // Calculate the start and end dates for the past month
-        var startDate = DateTime.UtcNow.AddMonths(-1);
-        var endDate = DateTime.UtcNow;
-
-        // Query the database for new patients within the past month
-        var newPatientsCount = await _repository
-            .GetAll<Patient>()
-            .CountAsync(p => p.CreatedAt >= startDate && p.CreatedAt <= endDate);
-
-        // Return the count of new patients
-        var result = new Integer { Data = newPatientsCount };
-        return Result.Success(result);
-    }
 }

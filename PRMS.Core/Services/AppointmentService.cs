@@ -28,8 +28,8 @@ namespace PRMS.Core.Services
                 return new Error[] { new("Auth.Error", "user not found") };
 
             var physicianAppointments = await _repository.GetAll<Appointment>()
-                .Include(a => a.Physician)
                 .Where(a => a.PhysicianId == a.Physician.UserId && a.Date >= startDate && a.Date <= endDate)
+                .Include(a => a.Physician)
                 .Select(c => new FetchPhysicianAppointmentsUserDto(c.Date))
                 .ToListAsync();
 

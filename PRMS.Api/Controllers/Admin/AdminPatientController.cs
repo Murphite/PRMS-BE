@@ -24,13 +24,14 @@ public class AdminPatientController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPatientList([FromRoute] string patientUserId)
+    public async Task<IActionResult> GetPatientList([FromQuery] PaginationFilter? paginationFilter = null)
     {
-        var result = await _adminPatientService.GetPatientDetails(patientUserId);
+        paginationFilter ??= new PaginationFilter();
+        var result = await _adminPatientService.GetListOfPatients(paginationFilter);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        return Ok(ResponseDto<PatientDetailsDto>.Success(result.Data));
+        return Ok(ResponseDto<object>.Success(result.Data));
     }
 
     [HttpGet("{patientUserId}")]
@@ -71,7 +72,8 @@ public class AdminPatientController : ControllerBase
     }
 
     [HttpPut("appointment/status")]
-    public async Task<IActionResult> UpdateAdminAppointmentStatus([FromBody] AppointmentStatus status, [FromRoute] string patientUserId)
+    public async Task<IActionResult> UpdateAdminAppointmentStatus([FromBody] AppointmentStatus status,
+        [FromRoute] string patientUserId)
     {
         var result = await _adminPatientService.UpdateAdminAppointmentStatus(patientUserId, status);
         if (result.IsFailure)
@@ -81,26 +83,38 @@ public class AdminPatientController : ControllerBase
     }
 
     [HttpGet("{patientUserId}/medications")]
-    public async Task<IActionResult> GetPatientPrescribedMedicationHistory([FromRoute] string patientUserId, [FromQuery] PaginationFilter? paginationFilter = null)
+    public async Task<IActionResult> GetPatientPrescribedMedicationHistory([FromRoute] string patientUserId,
+        [FromQuery] PaginationFilter? paginationFilter = null)
     {
         paginationFilter ??= new PaginationFilter();
 
-        var result = await _prescriptionService.GetPatiencePrescribedMedicationHistory(patientUserId, paginationFilter);
+        var result = await _prescriptionService.GetPatientPrescribedMedicationHistory(patientUserId, paginationFilter);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
         return Ok(ResponseDto<object>.Success(result));
     }
 
-	[HttpPut("{medicationId}/update-medication-status")]
-	public async Task<IActionResult> UpdateMedicationStatus([FromRoute] string medicationId, MedicationStatus medicationStatus)
-	{
-		var result = await _prescriptionService.UpdatePrescription(medicationId, medicationStatus);
-		if (result.IsFailure)
-			return BadRequest(ResponseDto<object>.Failure(result.Errors));
+    [HttpPut("{medicationId}/update-medication-status")]
+    public async Task<IActionResult> UpdateMedicationStatus([FromRoute] string medicationId,
+        MedicationStatus medicationStatus)
+    {
+        var result = await _prescriptionService.UpdateMedicationStatus(medicationId, medicationStatus);
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-		return Ok(ResponseDto<object>.Success(result));
+        return Ok(ResponseDto<object>.Success(result));
+    }
+    
+    [HttpGet("new-patients-count")]
+    public async Task<IActionResult> GetNewPatientsCount()
+    {
+        var result = await _adminPatientService.GetNewPatientsCount();
 
-	}
+        if (result.IsFailure)
+            return BadRequest(ResponseDto<object>.Failure(result.Errors));
+
+        return Ok(ResponseDto<object>.Success(result));
+    }
 
 }

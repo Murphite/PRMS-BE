@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
@@ -11,15 +12,18 @@ namespace PRMS.Core.Services;
 public class PrescriptionService : IPrescriptionService
 {
     private readonly IRepository _repository;
+    private readonly UserManager<User> _userManager;
     private readonly IUnitOfWork _unitOfWork;
 
-    public PrescriptionService(IRepository repository, IUnitOfWork unitOfWork)
+    public PrescriptionService(IRepository repository, UserManager<User> userManager, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _userManager = userManager;
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result> CreatePrescription(string patientUserId, string physicianUserId, CreatePrescriptionDto prescriptionDto)
+    public async Task<Result> CreatePrescription(string patientUserId, string physicianUserId,
+        CreatePrescriptionDto prescriptionDto)
     {
         var patientId = await _repository.GetAll<Patient>()
             .Where(p => p.UserId == patientUserId)
@@ -65,33 +69,29 @@ public class PrescriptionService : IPrescriptionService
         return Result.Success();
     }
 
-    public async Task<Result<PaginatorDto<IEnumerable<PrescribedMedicationDto>>>> GetPatiencePrescribedMedicationHistory(string patientUserId, PaginationFilter paginationFilter)
+    public async Task<Result<PaginatorDto<IEnumerable<PrescribedMedicationDto>>>>
+        GetPatientPrescribedMedicationHistory(string patientUserId, PaginationFilter paginationFilter)
     {
-        if (patientUserId.IsNullOrEmpty())
-        {
-            return new Error[] { new("Patient.Error", "Patient is Invalid") };
-        }
         var patient = await _repository.GetAll<Patient>()
             .FirstOrDefaultAsync(x => x.UserId == patientUserId);
         if (patient == null)
         {
-
             return new Error[] { new("Patient.Error", "Patient not found") };
-
         }
+
         var patientPrescribedMedicationHistory = await _repository
             .GetAll<Medication>()
             .Where(x => x.PatientId == patient.Id)
             .OrderByDescending(x => x.CreatedAt)
             .Select(m => new PrescribedMedicationDto
             {
-                PhysicianName = m.Prescription.Physician.Title + " " + m.Prescription.Physician.User.FirstName + " " + m.Prescription.Physician.User.LastName,
                 MedicationName = m.Name,
                 Dosage = m.Dosage,
                 Date = m.CreatedAt.ToString("MMMM dd, yyyy"),
                 Instruction = m.Instruction,
                 Status = m.MedicationStatus.ToString(),
             }).Paginate(paginationFilter);
+        
         return Result.Success(patientPrescribedMedicationHistory);
     }
 
@@ -123,9 +123,9 @@ public class PrescriptionService : IPrescriptionService
 
         return Result.Success(medicationHistoryDto);
     }
-    public async Task<Result> UpdatePrescription(string medicationId, MedicationStatus medicationStatus)
-    {
 
+    public async Task<Result> UpdateMedicationStatus(string medicationId, MedicationStatus medicationStatus)
+    {
         var medication = await _repository.GetAll<Medication>().FirstOrDefaultAsync(x => x.Id == medicationId);
 
         if (medication == null)
@@ -138,6 +138,26 @@ public class PrescriptionService : IPrescriptionService
         _repository.Update(medication);
         await _unitOfWork.SaveChangesAsync();
         return Result.Success("Medication Status Updated Successfully");
-
     }
+
+    // public async Task<Result<PaginatorDto<IEnumerable<PrescriptionsDto>>>> FetchPrescriptionHistory(
+    //     string physicianUserId, PaginationFilter paginationFilter)
+    // {
+    //     var prescriptions = await _repository.GetAll<Prescription>()
+    //         .Where(p => p.PhysicianId == physicianUserId)
+    //         .Include(p => p.Medications)
+    //         .Select(p => new PrescriptionsDto
+    //         {
+    //             MedicationId = p.Me,
+    //             Date = p.CreatedAt.ToString("MMMM dd,yyyy"),
+    //             PatientName = $"{p.Patient.User.FirstName} {p.Patient.User.LastName}",
+    //             MedicationName = p.Name,
+    //             Dosage = p.Dosage,
+    //             Instructions = p.Instruction,
+    //             MedicationStatus = p.MedicationStatus.ToString(),
+    //         })
+    //         .Paginate(paginationFilter);
+    //
+    //     return physicianPrescriptions;
+    // }
 }

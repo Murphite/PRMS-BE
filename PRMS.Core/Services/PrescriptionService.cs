@@ -99,7 +99,7 @@ public class PrescriptionService : IPrescriptionService
     {
         if (string.IsNullOrEmpty(medicationId))
         {
-            return new Error[] { new("Medication.Error", "Medication not found") };
+            return new Error[] { new("Medication.Error", "Invalid input") };
         }
 
         var medication = await _repository.GetAll<Medication>()

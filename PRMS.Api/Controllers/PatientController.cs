@@ -51,7 +51,7 @@ public class PatientController : ControllerBase
         return Ok(ResponseDto<object>.Success());
     }
 
-    [HttpGet("appointments")]
+    [HttpGet("appointment")]
     public async Task<IActionResult> GetPatientAppointments([FromQuery] string? status = null,
         [FromQuery] PaginationFilter? paginationFilter = null)
     {
@@ -69,7 +69,7 @@ public class PatientController : ControllerBase
         return _userManager.GetUserId(User)!;
     }
 
-    [HttpGet("medications")]
+    [HttpGet("medication")]
     public async Task<IActionResult> GetPatientPrescribedMedicationHistory(
         [FromQuery] PaginationFilter? paginationFilter = null)
     {
@@ -84,7 +84,7 @@ public class PatientController : ControllerBase
         return Ok(ResponseDto<object>.Success(result));
     }
 
-    [HttpGet("medications/{medicationId}")]
+    [HttpGet("medication/{medicationId}")]
     public async Task<IActionResult> GetPatientPrescribedMedicationHistory([FromRoute] string medicationId)
     {
         var result = await _prescriptionService.GetPrescribedMedicationHistoryById(medicationId);
@@ -94,7 +94,7 @@ public class PatientController : ControllerBase
         return Ok(ResponseDto<object>.Success(result));
     }
 
-    [HttpPut("{medicationId}/update-medication-status")]
+    [HttpPut("medication/{medicationId}/update-medication-status")]
     public async Task<IActionResult> UpdateMedicationStatus([FromRoute] string medicationId,
         [FromBody] MedicationStatus medicationStatus)
     {

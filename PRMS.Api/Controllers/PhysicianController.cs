@@ -33,7 +33,7 @@ public class PhysicianController : ControllerBase
     }
 
     [HttpGet("{physicianId}/reviews")]
-    public async Task<IActionResult> GetReviews([FromRoute] string physicianId, PaginationFilter? paginationFilter)
+    public async Task<IActionResult> GetReviews([FromRoute] string physicianId, [FromQuery] PaginationFilter? paginationFilter)
     {
         paginationFilter ??= new PaginationFilter();
         var result = await _physicianService.GetReviews(physicianId, paginationFilter);

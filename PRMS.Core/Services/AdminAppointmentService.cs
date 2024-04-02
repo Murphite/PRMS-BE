@@ -81,7 +81,7 @@ public class AdminAppointmentService : IAdminAppointmentService
         }
 
         var physicianAppointments = _repository.GetAll<Appointment>()
-            .Where(p => p.PhysicianId == physicianId && p.Date >= DateTimeOffset.Now && p.Status == AppointmentStatus.Pending)
+            .Where(p => p.PhysicianId == physicianId && p.Date >= DateTimeOffset.Now.ToUniversalTime() && p.Status == AppointmentStatus.Pending)
             .OrderByDescending(p => p.Date)
             .Include(p => p.Patient.Medications)
             .Include(p => p.Patient.Prescriptions)

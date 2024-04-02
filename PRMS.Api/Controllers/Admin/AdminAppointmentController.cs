@@ -24,12 +24,11 @@ public class AdminAppointmentController : ControllerBase
         _userManager = userManager;
     }
 
-    [HttpGet("patient-appointment")]
-    public async Task<IActionResult> GetPatientAppointments([FromQuery] string? status = null,
-        PaginationFilter? paginationFilter = null)
+    [HttpGet("{physicianUserId}/patient-appointment")]
+    public async Task<IActionResult> GetPatientAppointments( [FromRoute] string physicianUserId, [FromQuery] string? status = null,
+	   [FromQuery] PaginationFilter? paginationFilter = null)
     {
         paginationFilter ??= new PaginationFilter();
-        var physicianUserId = _userManager.GetUserId(User);
         var result = await _adminAppointmentService.GetPatientAppointments(physicianUserId!, status, paginationFilter);
 
         if (result.IsFailure)

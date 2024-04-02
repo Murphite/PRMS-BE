@@ -42,23 +42,39 @@ public class PhysicianService : IPhysicianService
         return reviews;
     }
 
-    public async Task<Result<PhysicianDetailsDto>> GetDetails(string physicianId)
+    public async Task<Result<PhysicianDetailsDto>> GetDetails(string physicianUserId)
     {
-        var result = await _repository.GetAll<Physician>()
-            .Where(p => p.Id == physicianId)
-            .ToListAsync();
+        var physician = await _repository.GetAll<Physician>().FirstOrDefaultAsync(p => p.UserId==physicianUserId);
 
-        var physician = await _repository.GetAll<Physician>()
-            .Where(p => p.Id == physicianId)
+
+        var physicianDetails = await _repository.GetAll<Physician>()
+            .Where(p => p.Id == physician.Id)
             .Include(p => p.User)
             .Include(p => p.MedicalCenter)
             .Include(p => p.Reviews)
             .FirstOrDefaultAsync();
+        var phyd = new PhysicianDetailsDto
+        {
+            Name = $"{physicianDetails.User.FirstName} {physicianDetails.User.LastName}",
+            Title = physicianDetails.Title,
+            ImageUrl = physicianDetails.User.ImageUrl,
+            PatientCount = physicianDetails.Patients.Count(),
+            YearsOfExperience = physicianDetails.YearsOfExperience,
+            MedicalCenterName = physicianDetails.MedicalCenter.Name,
+            //MedicalCenterAddress = $"{physicianDetails.MedicalCenter.Address.City} {physicianDetails.MedicalCenter.Address.Country}",
+            About = physicianDetails.About,
+            WorkingTime = physicianDetails.WorkingTime,
+            Speciality = physicianDetails.Speciality
 
-        if (physician is null)
+        };
+
+
+	
+
+		if (physician is null)
             return new Error[] { new("Physician.NotFound", "Physician not found") };
 
-        return new PhysicianDetailsDto();
+        return phyd;
     }
 
     public async Task<Result<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>> GetAll(PaginationFilter paginationFilter)
@@ -94,17 +110,10 @@ public class PhysicianService : IPhysicianService
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
             return new Error[] { new("User.NotFound", "User not found") };
-        
-        var patientId = await _repository.GetAll<Patient>()
-            .Where(p => p.UserId == userId)
-            .Select(p => p.Id)
-            .FirstOrDefaultAsync();
-        
-        if (patientId is null)
-            return new Error[] { new("Patient.NotFound", "Patient not found") };
+       
         
         var physicianPrescriptions = await _repository.GetAll<Medication>()
-            .Where(m => m.PatientId == patientId)
+            .Where(m => m.Prescription.PhysicianId == user.Id)
             .Include(m => m.Prescription)
             .Include(m => m.Patient)
             .ThenInclude(m => m.User)

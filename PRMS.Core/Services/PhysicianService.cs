@@ -42,18 +42,19 @@ public class PhysicianService : IPhysicianService
         return reviews;
     }
 
-    public async Task<Result<PhysicianDetailsDto>> GetDetails(string physicianUserId)
+    public async Task<Result<PhysicianDetailsDto>> GetDetails(string physicianId)
     {
-        var physician = await _repository.GetAll<Physician>().FirstOrDefaultAsync(p => p.UserId==physicianUserId);
-
 
         var physicianDetails = await _repository.GetAll<Physician>()
-            .Where(p => p.Id == physician.Id)
+            .Where(p => p.Id == physicianId)
             .Include(p => p.User)
             .Include(p => p.MedicalCenter)
             .Include(p => p.Reviews)
             .FirstOrDefaultAsync();
-        var phyd = new PhysicianDetailsDto
+        if(physicianDetails == null)
+			return new Error[] { new("Physician.Error", "No record of Physician Detail") };
+
+		var physicianDetailsToReturn = new PhysicianDetailsDto
         {
             Name = $"{physicianDetails.User.FirstName} {physicianDetails.User.LastName}",
             Title = physicianDetails.Title,
@@ -61,20 +62,21 @@ public class PhysicianService : IPhysicianService
             PatientCount = physicianDetails.Patients.Count(),
             YearsOfExperience = physicianDetails.YearsOfExperience,
             MedicalCenterName = physicianDetails.MedicalCenter.Name,
-            //MedicalCenterAddress = $"{physicianDetails.MedicalCenter.Address.City} {physicianDetails.MedicalCenter.Address.Country}",
+            MedicalCenterAddress = $"{physicianDetails.MedicalCenter?.Address.Street} {physicianDetails.MedicalCenter?.Address.City} {physicianDetails.MedicalCenter?.Address.State} {physicianDetails.MedicalCenter?.Address.Country}",
             About = physicianDetails.About,
             WorkingTime = physicianDetails.WorkingTime,
-            Speciality = physicianDetails.Speciality
-
-        };
+            Speciality = physicianDetails.Speciality,
+            ReviewCount=physicianDetails.Reviews.Count(),
+            AverageRating= (int)Math.Round(physicianDetails.Reviews.Average(r => r.Rating))
+		};
 
 
 	
 
-		if (physician is null)
-            return new Error[] { new("Physician.NotFound", "Physician not found") };
+		//if (physician is null)
+  //          return new Error[] { new("Physician.NotFound", "Physician not found") };
 
-        return phyd;
+        return physicianDetailsToReturn;
     }
 
     public async Task<Result<PaginatorDto<IEnumerable<GetPhysiciansDTO>>>> GetAll(PaginationFilter paginationFilter)
@@ -107,13 +109,13 @@ public class PhysicianService : IPhysicianService
     public async Task<Result<PaginatorDto<IEnumerable<PrescriptionsDto>>>> FetchPrescriptions(
         string userId, PaginationFilter paginationFilter)
     {
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user is null)
+        var physicianUser = await _userManager.FindByIdAsync(userId);
+        if (physicianUser is null)
             return new Error[] { new("User.NotFound", "User not found") };
        
         
         var physicianPrescriptions = await _repository.GetAll<Medication>()
-            .Where(m => m.Prescription.PhysicianId == user.Id)
+            .Where(m => m.Prescription.PhysicianId == physicianUser.Id)
             .Include(m => m.Prescription)
             .Include(m => m.Patient)
             .ThenInclude(m => m.User)

@@ -22,7 +22,7 @@ public class PhysicianController : ControllerBase
         _userManager = userManager;
     }
 
-    [HttpGet("{physicianId}")]
+    [HttpGet("{physicianId}/GetDetails")]
     public async Task<IActionResult> GetPhysicianDetails([FromRoute] string physicianId)
     {
         var result = await _physicianService.GetDetails(physicianId);

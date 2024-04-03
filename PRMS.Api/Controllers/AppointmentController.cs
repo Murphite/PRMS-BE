@@ -41,7 +41,7 @@ public class AppointmentController : ControllerBase
         var result = await _appointmentService.GetAppointmentsForPhysician(physicianUserId, startDate, endDate);
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
-        return Ok(ResponseDto<object>.Success());
+        return Ok(ResponseDto<object>.Success(result));
     }
 
     [HttpPut("{appointmentId}/status")]
@@ -68,10 +68,10 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpGet("{physicianId}/appointments/total")]
-    public async Task<IActionResult> GetTotalAppointmentsForDay(string physicianId, [FromQuery] DateTime? date)
+    public async Task<IActionResult> GetTotalAppointmentsForDay(string physicianId, [FromQuery] DateTimeOffset? date)
     {
         // If date is not provided, default it to the current day
-        DateTime currentDate = date ?? DateTime.UtcNow.Date;
+        var currentDate = date ?? DateTimeOffset.Now;
 
         var result = await _appointmentService.GetTotalAppointmentsForDay(physicianId, currentDate);
 

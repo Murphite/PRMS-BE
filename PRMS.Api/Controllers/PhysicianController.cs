@@ -22,7 +22,7 @@ public class PhysicianController : ControllerBase
         _userManager = userManager;
     }
 
-    [HttpGet("{physicianId}")]
+    [HttpGet("{physicianId}/GetDetails")]
     public async Task<IActionResult> GetPhysicianDetails([FromRoute] string physicianId)
     {
         var result = await _physicianService.GetDetails(physicianId);
@@ -33,7 +33,7 @@ public class PhysicianController : ControllerBase
     }
 
     [HttpGet("{physicianId}/reviews")]
-    public async Task<IActionResult> GetReviews([FromRoute] string physicianId, PaginationFilter? paginationFilter)
+    public async Task<IActionResult> GetReviews([FromRoute] string physicianId, [FromQuery] PaginationFilter? paginationFilter)
     {
         paginationFilter ??= new PaginationFilter();
         var result = await _physicianService.GetReviews(physicianId, paginationFilter);

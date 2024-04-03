@@ -23,12 +23,13 @@ namespace PRMS.Core.Services
         public async Task<Result<IEnumerable<FetchPhysicianAppointmentsUserDto>>> GetAppointmentsForPhysician(
             string physicianUserId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
-            var user = await _userManager.FindByIdAsync(physicianUserId);
+            var user = _repository.GetAll<Physician>().FirstOrDefault(x=>x.UserId==physicianUserId);
+            var physicianId = user.Id;
             if (user == null)
                 return new Error[] { new("Auth.Error", "user not found") };
 
             var physicianAppointments = await _repository.GetAll<Appointment>()
-                .Where(a => a.PhysicianId == a.Physician.UserId && a.Date >= startDate && a.Date <= endDate)
+                .Where(a => a.PhysicianId == physicianId && a.Date >= DateTimeOffset.UtcNow && a.Date <= DateTimeOffset.UtcNow.AddDays(30))
                 .Include(a => a.Physician)
                 .Select(c => new FetchPhysicianAppointmentsUserDto(c.Date))
                 .ToListAsync();
@@ -103,7 +104,7 @@ namespace PRMS.Core.Services
             return Result.Success();
         }
 
-        public async Task<Result<Integer>> GetTotalAppointmentsForDay(string physicianId, DateTime date)
+        public async Task<Result<Integer>> GetTotalAppointmentsForDay(string physicianId, DateTimeOffset date)
         {
             // Check if the physician exists
             var physicianExists = await _repository.GetAll<Physician>().AnyAsync(p => p.Id == physicianId);
@@ -115,7 +116,7 @@ namespace PRMS.Core.Services
             // Query the total appointments for the day
             var totalAppointments = await _repository
                     .GetAll<Appointment>()
-                    .CountAsync(a => a.PhysicianId == physicianId && a.CreatedAt.Date == date.Date);
+                    .CountAsync(a => a.PhysicianId == physicianId && a.CreatedAt.Date == date);
 
             var result = new Integer { Data = totalAppointments };
             return Result.Success(result);

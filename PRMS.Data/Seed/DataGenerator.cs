@@ -78,7 +78,7 @@ public class DataGenerator
         return addresses;
     }
 
-    private async Task<IEnumerable<User>> GenerateUsers(int count)
+    private async Task<IEnumerable<User>> GenerateUsers(int count, string role = RolesConstant.User)
     {
         var userAddresses = await GenerateAddresses(count);
         var users = new List<User>();
@@ -97,7 +97,7 @@ public class DataGenerator
                 .Generate();
 
             await _userManager.CreateAsync(user, "Password@123");
-            await _userManager.AddToRoleAsync(user, RolesConstant.User);
+            await _userManager.AddToRoleAsync(user, role);
             users.Add(user);
         }
 
@@ -166,7 +166,7 @@ public class DataGenerator
 
     private async Task GeneratePhysicians(int count)
     {
-        var users = await GenerateUsers(count);
+        var users = await GenerateUsers(count, RolesConstant.Admin);
         var faker = new Faker();
 
         foreach (var user in users)

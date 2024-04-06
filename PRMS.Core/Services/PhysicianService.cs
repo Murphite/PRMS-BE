@@ -56,18 +56,20 @@ public class PhysicianService : IPhysicianService
 
 		var physicianDetailsToReturn = new PhysicianDetailsDto
         {
+            PhysicianId = physicianDetails.Id,
+            PhysicianUserId = physicianDetails.User.Id,
             Name = $"{physicianDetails.User.FirstName} {physicianDetails.User.LastName}",
             Title = physicianDetails.Title,
             ImageUrl = physicianDetails.User.ImageUrl,
             PatientCount = physicianDetails.Patients.Count(),
             YearsOfExperience = physicianDetails.YearsOfExperience,
             MedicalCenterName = physicianDetails.MedicalCenter.Name,
-            MedicalCenterAddress = $"{physicianDetails.MedicalCenter?.Address.Street} {physicianDetails.MedicalCenter?.Address.City} {physicianDetails.MedicalCenter?.Address.State} {physicianDetails.MedicalCenter?.Address.Country}",
+            /*MedicalCenterAddress = $"{physicianDetails.MedicalCenter?.Address.Street} {physicianDetails.MedicalCenter?.Address.City} {physicianDetails.MedicalCenter?.Address.State} {physicianDetails.MedicalCenter?.Address.Country}",
             About = physicianDetails.About,
             WorkingTime = physicianDetails.WorkingTime,
             Speciality = physicianDetails.Speciality,
             ReviewCount=physicianDetails.Reviews.Count(),
-            AverageRating= (int)Math.Round(physicianDetails.Reviews.Average(r => r.Rating))
+            AverageRating= (int)Math.Round(physicianDetails.Reviews.Average(r => r.Rating))*/
 		};
 
 
@@ -88,6 +90,8 @@ public class PhysicianService : IPhysicianService
             .ThenInclude(user => user.Address)
             .Select(physician => new GetPhysiciansDTO
             {
+                PhysicianUserId = physician.User.Id,
+                PhysicianId = physician.Id,
                 FirstName = physician.User.FirstName,
                 LastName = physician.User.LastName,
                 MiddleName = physician.User.MiddleName,

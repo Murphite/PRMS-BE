@@ -8,7 +8,9 @@ namespace PRMS.Core.Dtos
 {
     public class PhysicianDetailsDto
     {
-        public double AverageRating { get; set; }
+		public string PhysicianUserId { get; set; }
+		public string PhysicianId { get; set; }
+		public double AverageRating { get; set; }
         public int ReviewCount { get; set; }
         public string Name { get; set; }
         public string Title { get; set; }

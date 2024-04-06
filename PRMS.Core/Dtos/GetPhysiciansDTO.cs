@@ -9,6 +9,8 @@ namespace PRMS.Core.Dtos
     public class GetPhysiciansDTO
     {
         //PHYSICICAN USER DETAILS
+        public string PhysicianUserId { get; set; }
+        public string PhysicianId { get; set; }
         public string FirstName { get; set; }
         public string? MiddleName { get; set; }
         public string LastName { get; set; }

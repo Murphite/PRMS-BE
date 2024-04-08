@@ -152,9 +152,9 @@ public class PatientService : IPatientService
             BloodGroup = patientDto.BloodGroup,
             Height = patientDto.Height,
             Weight = patientDto.Weight,
-            PrimaryPhysicanEmail = patientDto.PrimaryPhysicanEmail,
-            PrimaryPhysicanName = patientDto.PrimaryPhysicanName,
-            PrimaryPhysicanPhoneNo = patientDto.PrimaryPhysicanPhoneNo,
+            PrimaryPhysicanEmail = patientDto.PrimaryPhysicianEmail,
+            PrimaryPhysicanName = patientDto.PrimaryPhysicianName,
+            PrimaryPhysicanPhoneNo = patientDto.PrimaryPhysicianPhoneNo,
             EmergencyContactName = patientDto.EmergencyContactName,
             EmergencyContactPhoneNo = patientDto.EmergencyContactPhoneNo,
             EmergencyContactRelationship = patientDto.EmergencyContactRelationship,
@@ -162,18 +162,18 @@ public class PatientService : IPatientService
             UpdatedAt = DateTimeOffset.UtcNow,
         };
 
-        // newPatient.Medications = patientDto.Medications.Select(x => new Medication
-        // {
-        //     PatientId = newPatient.Id,
-        //     Name = x.Name,
-        //     Dosage = x.Dosage,
-        //     Frequency = x.Frequency,
-        // }).ToList();
-        // newPatient.MedicalDetails = patientDto.MedicalDetails.Select(x => new MedicalDetail
-        // {
-        //     MedicalDetailsType = x.MedicalDetailsType,
-        //     Value = x.Value
-        // }).ToList();
+        newPatient.Medications = patientDto.Medications.Select(x => new Medication
+        {
+            PatientId = newPatient.Id,
+            Name = x.Name,
+            Dosage = x.Dosage,
+            Frequency = x.Frequency,
+        }).ToList();
+        newPatient.MedicalDetails = patientDto.MedicalDetails.Select(x => new MedicalDetail
+        {
+            MedicalDetailsType = x.MedicalDetailsType,
+            Value = x.Value
+        }).ToList();
 
         await _repository.Add(newPatient);
         await _unitOfWork.SaveChangesAsync();

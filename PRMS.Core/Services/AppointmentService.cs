@@ -84,6 +84,7 @@ namespace PRMS.Core.Services
             await _repository.Add(appointment);
             await _unitOfWork.SaveChangesAsync();
 
+            
             return Result.Success();
         }
 

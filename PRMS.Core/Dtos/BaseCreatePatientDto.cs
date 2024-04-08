@@ -16,9 +16,9 @@ public abstract class BaseCreatePatientDto
     [Required] public float Height { get; set; }
     [Required] public float Weight { get; set; }
     [Required] public BloodGroup BloodGroup { get; set; }
-    public string? PrimaryPhysicanName { get; set; }
-    public string? PrimaryPhysicanEmail { get; set; }
-    public string? PrimaryPhysicanPhoneNo { get; set; }
+    public string? PrimaryPhysicianName { get; set; }
+    public string? PrimaryPhysicianEmail { get; set; }
+    public string? PrimaryPhysicianPhoneNo { get; set; }
     public ICollection<AddPatientMedicationDto> Medications { get; set; }
     [Required] public string EmergencyContactName { get; set; }
     [Required] public string EmergencyContactRelationship { get; set; }

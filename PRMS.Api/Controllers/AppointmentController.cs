@@ -46,8 +46,9 @@ public class AppointmentController : ControllerBase
 
     [HttpPut("{appointmentId}/status")]
     public async Task<IActionResult> UpdateAppointmentStatus([FromRoute] string appointmentId,
-        [FromBody] AppointmentStatus status)
+        [FromBody] AppointmentUpdateDto data)
     {
+        var status = (AppointmentStatus)data.Status;
         var userId = _userManager.GetUserId(User);
         var result = await _appointmentService.UpdateAppointmentStatus(userId!, appointmentId, status);
         if (result.IsFailure)
@@ -81,4 +82,9 @@ public class AppointmentController : ControllerBase
         return Ok(ResponseDto<object>.Success(result));
 
     }
+}
+
+public class AppointmentUpdateDto
+{
+    public int Status { get; set; }
 }

@@ -93,7 +93,7 @@ public class AdminAppointmentService : IAdminAppointmentService
                 $"{p.Patient.User.FirstName} {p.Patient.User.LastName}",
                 p.Patient.User.Email!,
                 p.Patient.User.ImageUrl,
-                p.Date.ToString("MMMM dd,yyyy"),
+                p.Date.ToString("MMMM dd, yyyy"),
                 p.Patient.BloodGroup.ToString(),
                 p.Patient.Height,
                 p.Patient.Weight,

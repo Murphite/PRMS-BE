@@ -160,6 +160,7 @@ public class AdminAppointmentService : IAdminAppointmentService
             .Where(p => p.UserId == physicianUserId)
             .Select(p => p.Id)
             .FirstOrDefaultAsync();
+        
         if (physicianId is null)
         {
             return new Error[] { new("Physician.Error", "Physician not found") };
@@ -170,6 +171,7 @@ public class AdminAppointmentService : IAdminAppointmentService
             .OrderByDescending(c => c.Date)
             .Select(r => new GetPhysicianAppointmentsByDateDto
             {
+                Id = r.Id,
                 FirstName = r.Patient.User.FirstName,
                 LastName = r.Patient.User.LastName,
                 Email = r.Patient.User.Email!,
@@ -179,6 +181,9 @@ public class AdminAppointmentService : IAdminAppointmentService
                 BloodType = r.Patient.BloodGroup,
                 PhysicianName = r.Patient.PrimaryPhysicanName,
                 Date = r.Date,
+                ScheduledDate = r.Date.ToString("MMMM dd,yyyy"),
+                TimeSlot = $"{r.Date:hh:mm tt} - {r.Date.AddMinutes(30):hh:mm tt}",
+                Status = r.Status.ToString(),
                 CurrentMedication = r.Patient.Medications
                     .Select(m => new PatientMedication
                     (

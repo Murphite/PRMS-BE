@@ -25,8 +25,9 @@ public class AdminAppointmentController : ControllerBase
     }
 
     [HttpGet("{physicianUserId}/patient-appointment")]
-    public async Task<IActionResult> GetPatientAppointments( [FromRoute] string physicianUserId, [FromQuery] string? status = null,
-	   [FromQuery] PaginationFilter? paginationFilter = null)
+    public async Task<IActionResult> GetPatientAppointments([FromRoute] string physicianUserId,
+        [FromQuery] string? status = null,
+        [FromQuery] PaginationFilter? paginationFilter = null)
     {
         paginationFilter ??= new PaginationFilter();
         var result = await _adminAppointmentService.GetPatientAppointments(physicianUserId!, status, paginationFilter);
@@ -61,7 +62,8 @@ public class AdminAppointmentController : ControllerBase
     }
 
     [HttpGet("physician-date-appointments")]
-    public async Task<IActionResult> GetAllPhysicianAppointmentsSortedByDate(PaginationFilter? paginationFilter)
+    public async Task<IActionResult> GetAllPhysicianAppointmentsSortedByDate(
+        [FromQuery] PaginationFilter? paginationFilter)
     {
         var physicianUserId = _userManager.GetUserId(User);
         paginationFilter ??= new PaginationFilter();

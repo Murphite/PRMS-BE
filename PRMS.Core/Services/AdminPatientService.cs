@@ -84,13 +84,20 @@ public class AdminPatientService : IAdminPatientService
     public async Task<Result<PaginatorDto<IEnumerable<PatientDto>>>> GetListOfPatients(PaginationFilter paginationFilter)
     {
         var patients = await _repository.GetAll<Patient>()
+            .Include(patient => patient.User)
+            .Include(patient => patient.Appointments)
+            .Where(patient => patient.Appointments.Any())
             .Select(patient => new PatientDto
             {
+                UserId = patient.UserId,
                 PatientId = patient.Id,
                 PatientName = $"{patient.User.FirstName} {patient.User.LastName}",
                 ImageUrl = patient.User.ImageUrl,
-                DateCreated = patient.CreatedAt,
-                NoOfAppointments = patient.Appointments.Count()
+                Email = patient.User.Email!,
+                StartTime = patient.Appointments.OrderByDescending(c => c.CreatedAt).First().Date.ToString("hh:mm tt"),
+                EndTime = patient.Appointments.OrderByDescending(c => c.CreatedAt).First().Date.AddMinutes(30).ToString("hh:mm tt"),
+                AppointmentDate = patient.CreatedAt.ToString("MMMM dd, yyyy"),
+                NoOfAppointments = patient.Appointments.Count
             })
             .Paginate(paginationFilter);
 
@@ -168,9 +175,9 @@ public class AdminPatientService : IAdminPatientService
             Medications = (ICollection<Medication>)patientDto.Medications,
             Height = patientDto.Height,
             Weight = patientDto.Weight,
-            PrimaryPhysicanEmail = patientDto.PrimaryPhysicanEmail,
-            PrimaryPhysicanName = patientDto.PrimaryPhysicanName,
-            PrimaryPhysicanPhoneNo = patientDto.PrimaryPhysicanPhoneNo,
+            PrimaryPhysicanEmail = patientDto.PrimaryPhysicianEmail,
+            PrimaryPhysicanName = patientDto.PrimaryPhysicianName,
+            PrimaryPhysicanPhoneNo = patientDto.PrimaryPhysicianPhoneNo,
             MedicalDetails = (ICollection<MedicalDetail>)patientDto.MedicalDetails,
             EmergencyContactName = patientDto.EmergencyContactName,
             EmergencyContactPhoneNo = patientDto.EmergencyContactPhoneNo,

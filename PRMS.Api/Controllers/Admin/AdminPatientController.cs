@@ -1,16 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PRMS.Api.Dtos;
 using PRMS.Api.Extensions;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
-using PRMS.Core.Services;
 using PRMS.Domain.Constants;
 using PRMS.Domain.Enums;
 
 namespace PRMS.Api.Controllers.Admin;
 
 [Route("api/v1/admin/patient")]
-// [Authorize(Roles = RolesConstant.Admin)]
+[Authorize(Roles = RolesConstant.Admin)]
 [ApiController]
 public class AdminPatientController : ControllerBase
 {

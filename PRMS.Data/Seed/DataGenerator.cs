@@ -176,7 +176,7 @@ public class DataGenerator
             var physician = new Faker<Physician>()
                 .RuleFor(p => p.UserId, user.Id)
                 .RuleFor(p => p.MedicalCenterId, medicalCenter.Id)
-                .RuleFor(p => p.Title, f => f.PickRandom(new[] { "Dr", "Nurse", "Pharm" }))
+                .RuleFor(p => p.Title, f => f.PickRandom(new[] { "Dr" }))
                 .RuleFor(p => p.Speciality,
                     f => f.PickRandom("Cardiologist", "Dentist", "Neurologist", "Surgeon", "Gynecologist", "Pediatrics",
                         "Orthopedic Surgeon", "Psychiatrist"))

@@ -112,10 +112,13 @@ public class PhysicianService : IPhysicianService
         var physicianUser = await _userManager.FindByIdAsync(userId);
         if (physicianUser is null)
             return new Error[] { new("User.NotFound", "User not found") };
-       
+        var physicianId = await _repository.GetAll<Physician>()
+            .Where(p => p.UserId == userId)
+            .Select(p => p.Id)
+            .FirstAsync();
         
         var physicianPrescriptions = await _repository.GetAll<Medication>()
-            .Where(m => m.Prescription.PhysicianId == physicianUser.Id)
+            .Where(m =>  m.Prescription != null && m.Prescription.PhysicianId == physicianId)
             .Include(m => m.Prescription)
             .Include(m => m.Patient)
             .ThenInclude(m => m.User)

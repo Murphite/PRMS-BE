@@ -28,7 +28,8 @@ public class JwtService : IJwtService
             new(ClaimTypes.NameIdentifier, user.Id),
             new(JwtRegisteredClaimNames.Sub, user.Id),
             new(JwtRegisteredClaimNames.Name, $"{user.FirstName} {user.LastName}"),
-            new(JwtRegisteredClaimNames.Email, user.Email!)
+            new(JwtRegisteredClaimNames.Email, user.Email!),
+            new("Image", user.ImageUrl ?? string.Empty)
         };
         claimList.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using PRMS.Domain.Enums;
 
 namespace PRMS.Core.Services
-{ 
+{
     public class AppointmentService : IAppointmentService
     {
         private readonly IRepository _repository;
@@ -23,14 +23,16 @@ namespace PRMS.Core.Services
         public async Task<Result<IEnumerable<FetchPhysicianAppointmentsUserDto>>> GetAppointmentsForPhysician(
             string physicianUserId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
-            var user = _repository.GetAll<Physician>().FirstOrDefault(x=>x.UserId==physicianUserId);
-            var physicianId = user.Id;
-            if (user == null)
+            var physicianId = _repository.GetAll<Physician>()
+                .Where(x => x.UserId == physicianUserId)
+                .Select(p => p.Id)
+                .FirstOrDefault();
+            
+            if (physicianId == null)
                 return new Error[] { new("Auth.Error", "user not found") };
 
             var physicianAppointments = await _repository.GetAll<Appointment>()
-                .Where(a => a.PhysicianId == physicianId && a.Date >= DateTimeOffset.UtcNow && a.Date <= DateTimeOffset.UtcNow.AddDays(30))
-                .Include(a => a.Physician)
+                .Where(a => a.PhysicianId == physicianId && a.Date >= startDate && a.Date <= endDate)
                 .Select(c => new FetchPhysicianAppointmentsUserDto(c.Date))
                 .ToListAsync();
 
@@ -84,7 +86,7 @@ namespace PRMS.Core.Services
             await _repository.Add(appointment);
             await _unitOfWork.SaveChangesAsync();
 
-            
+
             return Result.Success();
         }
 
@@ -116,8 +118,8 @@ namespace PRMS.Core.Services
 
             // Query the total appointments for the day
             var totalAppointments = await _repository
-                    .GetAll<Appointment>()
-                    .CountAsync(a => a.PhysicianId == physicianId && a.CreatedAt.Date == date);
+                .GetAll<Appointment>()
+                .CountAsync(a => a.PhysicianId == physicianId && a.CreatedAt.Date == date);
 
             var result = new Integer { Data = totalAppointments };
             return Result.Success(result);

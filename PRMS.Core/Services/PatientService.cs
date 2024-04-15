@@ -62,7 +62,7 @@ public class PatientService : IPatientService
         return Result.Success();
     }
 
-    public async Task<Result> GetPatientAppointments(string userId, string? status, PaginationFilter paginationFilter)
+    public async Task<Result<PaginatorDto<IEnumerable<PatientAppointmentsToReturnDTO>>>> GetPatientAppointments(string userId, string? status, PaginationFilter paginationFilter)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
@@ -97,7 +97,7 @@ public class PatientService : IPatientService
             }
         }
 
-        var appointmentsToReturn = patientAppointments
+        var appointmentsToReturn = await patientAppointments
             .Select(p => new PatientAppointmentsToReturnDTO(
                 $"{p.Physician.User.FirstName} {p.Physician.User.LastName}",
                 p.Physician.Speciality,
@@ -107,7 +107,7 @@ public class PatientService : IPatientService
                 p.Date))
             .Paginate(paginationFilter);
 
-        return Result.Success(appointmentsToReturn);
+        return appointmentsToReturn;
     }
 
     public async Task<Result> CreatePatient(string userId, CreatePatientFromUserDto patientDto)

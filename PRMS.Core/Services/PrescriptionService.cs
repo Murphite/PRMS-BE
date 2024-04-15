@@ -137,7 +137,7 @@ public class PrescriptionService : IPrescriptionService
 
         _repository.Update(medication);
         await _unitOfWork.SaveChangesAsync();
-        return Result.Success("Medication Status Updated Successfully");
+        return Result.Success();
     }
 
     // public async Task<Result<PaginatorDto<IEnumerable<PrescriptionsDto>>>> FetchPrescriptionHistory(

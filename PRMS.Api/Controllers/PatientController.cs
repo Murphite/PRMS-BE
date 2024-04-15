@@ -61,7 +61,7 @@ public class PatientController : ControllerBase
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        return Ok(ResponseDto<object>.Success(result));
+        return Ok(ResponseDto<object>.Success(result.Data));
     }
 
     private string GetUserId()
@@ -81,7 +81,7 @@ public class PatientController : ControllerBase
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        return Ok(ResponseDto<object>.Success(result));
+        return Ok(ResponseDto<object>.Success(result.Data));
     }
 
     [HttpGet("medication/{medicationId}")]
@@ -91,7 +91,7 @@ public class PatientController : ControllerBase
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        return Ok(ResponseDto<object>.Success(result));
+        return Ok(ResponseDto<object>.Success(result.Data));
     }
 
     [HttpPut("medication/{medicationId}/update-medication-status")]
@@ -102,6 +102,6 @@ public class PatientController : ControllerBase
         if (result.IsFailure)
             return BadRequest(ResponseDto<object>.Failure(result.Errors));
 
-        return Ok(ResponseDto<object>.Success(result));
+        return Ok(ResponseDto<object>.Success());
     }
 }

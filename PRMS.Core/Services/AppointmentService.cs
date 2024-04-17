@@ -27,7 +27,7 @@ namespace PRMS.Core.Services
                 .Where(x => x.UserId == physicianUserId)
                 .Select(p => p.Id)
                 .FirstOrDefault();
-            
+
             if (physicianId == null)
                 return new Error[] { new("Auth.Error", "user not found") };
 
@@ -70,14 +70,17 @@ namespace PRMS.Core.Services
                 return new Error[] { new("User.NotFound", "User not found") };
 
             var patientId = _repository.GetAll<Patient>().First(p => p.UserId == user.Id).Id;
-
-            var date = appointmentDto.Date.ToDateTime(appointmentDto.Time);
+            var physicianId = _repository.GetAll<Physician>()
+                .Where(p => p.UserId == appointmentDto.PhysicianUserId)
+                .Select(p => p.Id)
+                .First();
+            
             var appointment = new Appointment
             {
-                Date = new DateTimeOffset(date).ToUniversalTime(),
+                Date = appointmentDto.Date,
                 Status = AppointmentStatus.Pending,
                 PatientId = patientId,
-                PhysicianId = appointmentDto.PhysicianId,
+                PhysicianId = physicianId,
                 Reason = appointmentDto.Reason,
                 CreatedAt = DateTimeOffset.UtcNow,
                 UpdatedAt = DateTimeOffset.UtcNow
@@ -85,7 +88,6 @@ namespace PRMS.Core.Services
 
             await _repository.Add(appointment);
             await _unitOfWork.SaveChangesAsync();
-
 
             return Result.Success();
         }

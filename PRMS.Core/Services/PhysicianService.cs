@@ -3,12 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PRMS.Core.Abstractions;
 using PRMS.Core.Dtos;
 using PRMS.Core.Utilities;
-using PRMS.Data.Contexts;
 using PRMS.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PRMS.Core.Services;
 
@@ -44,39 +39,38 @@ public class PhysicianService : IPhysicianService
 
     public async Task<Result<PhysicianDetailsDto>> GetDetails(string physicianId)
     {
-
         var physicianDetails = await _repository.GetAll<Physician>()
             .Where(p => p.Id == physicianId)
             .Include(p => p.User)
             .Include(p => p.MedicalCenter)
             .Include(p => p.Reviews)
             .FirstOrDefaultAsync();
-        if(physicianDetails == null)
-			return new Error[] { new("Physician.Error", "No record of Physician Detail") };
+        
+        if (physicianDetails == null)
+            return new Error[] { new("Physician.Error", "No record of Physician Detail") };
 
-		var physicianDetailsToReturn = new PhysicianDetailsDto
+        var physicianDetailsToReturn = new PhysicianDetailsDto
         {
             PhysicianId = physicianDetails.Id,
             PhysicianUserId = physicianDetails.User.Id,
             Name = $"{physicianDetails.User.FirstName} {physicianDetails.User.LastName}",
             Title = physicianDetails.Title,
             ImageUrl = physicianDetails.User.ImageUrl,
-            PatientCount = physicianDetails.Patients.Count(),
+            // PatientCount = physicianDetails.Patients == null ? 0 : physicianDetails.Patients.Count,
             YearsOfExperience = physicianDetails.YearsOfExperience,
             MedicalCenterName = physicianDetails.MedicalCenter.Name,
-            /*MedicalCenterAddress = $"{physicianDetails.MedicalCenter?.Address.Street} {physicianDetails.MedicalCenter?.Address.City} {physicianDetails.MedicalCenter?.Address.State} {physicianDetails.MedicalCenter?.Address.Country}",
+            MedicalCenterAddress =
+                $"{physicianDetails.MedicalCenter?.Address?.Street} {physicianDetails.MedicalCenter?.Address?.City} {physicianDetails.MedicalCenter?.Address?.State} {physicianDetails.MedicalCenter?.Address?.Country}",
             About = physicianDetails.About,
             WorkingTime = physicianDetails.WorkingTime,
             Speciality = physicianDetails.Speciality,
-            ReviewCount=physicianDetails.Reviews.Count(),
-            AverageRating= (int)Math.Round(physicianDetails.Reviews.Average(r => r.Rating))*/
-		};
+            ReviewCount = physicianDetails.Reviews.Count,
+            // AverageRating = (int)Math.Round(physicianDetails.Reviews.Average(r => r.Rating))
+        };
 
 
-	
-
-		//if (physician is null)
-  //          return new Error[] { new("Physician.NotFound", "Physician not found") };
+        //if (physician is null)
+        //          return new Error[] { new("Physician.NotFound", "Physician not found") };
 
         return physicianDetailsToReturn;
     }
@@ -120,9 +114,9 @@ public class PhysicianService : IPhysicianService
             .Where(p => p.UserId == userId)
             .Select(p => p.Id)
             .FirstAsync();
-        
+
         var physicianPrescriptions = await _repository.GetAll<Medication>()
-            .Where(m =>  m.Prescription != null && m.Prescription.PhysicianId == physicianId)
+            .Where(m => m.Prescription != null && m.Prescription.PhysicianId == physicianId)
             .Include(m => m.Prescription)
             .Include(m => m.Patient)
             .ThenInclude(m => m.User)

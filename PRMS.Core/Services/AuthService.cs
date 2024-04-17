@@ -141,7 +141,13 @@ public class AuthService : IAuthService
         var roles = await _userManager.GetRolesAsync(user);
         var token = _jwtService.GenerateToken(user, roles);
 
-        return new LoginResponseDto(token);
+        string? patientId = null;
+        if (roles.Contains(RolesConstant.User))
+        {
+            patientId = _repository.GetAll<Patient>().FirstOrDefault(p => p.UserId == user.Id)?.Id;
+        }
+        
+        return new LoginResponseDto(token, roles.First(), patientId);
     }
 
     public async Task<Result> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)

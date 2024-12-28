@@ -119,6 +119,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For any inquiries or issues, feel free to reach out:
 
-- **Email**: your.email@example.com
-- **GitHub**: [https://github.com/yourusername](https://github.com/yourusername)
-- **Project Repository**: [https://github.com/yourusername/PRMS](https://github.com/yourusername/PRMS)
+- **Email**: ogbeidemurphy@gmail.com
+- **GitHub**: [https://github.com/murphite](https://github.com/murphite)
+- **Project Repository**: [https://github.com/murphite/PRMS-BE](https://github.com/murphite/PRMS-BE)

@@ -52,5 +52,73 @@ Make sure you have the following installed on your local machine:
 ### Steps
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/PRMS.git
+
+    ```bash
+    git clone https://github.com/yourusername/PRMS.git
+    ```
+
+2. Navigate to the project directory:
+
+    ```bash
+    cd PRMS
+    ```
+
+3. Install dependencies for the backend:
+
+    ```bash
+    cd backend
+    dotnet restore
+    ```
+
+4. Configure environment variables:
+   - Create a `.env` file in the backend directory and add your database URL, API keys, etc.
+
+5. Start the backend server:
+
+    ```bash
+    dotnet run
+    ```
+
+6. Open your browser and go to `http://localhost:5000` to access the backend.
+
+## Usage
+
+Once the system is up and running, users can:
+
+- **Admin Users**: Manage patient records, view all appointments, generate reports, and assign user roles.
+- **Doctors**: Add and update patient diagnoses, manage prescriptions, view patient medical history, and schedule appointments.
+- **Patients**: View personal information, appointments, prescriptions, and contact their doctor.
+
+### Example Use Cases
+
+1. **Patient Registration**: A patient can be registered with personal details and medical history. The admin can add new patients through the system.
+   
+2. **Appointment Scheduling**: A doctor can schedule and manage appointments with patients, with automatic notifications to both the doctor and the patient.
+
+3. **Medical Record Update**: Doctors can update patient records with new diagnoses, prescriptions, and medical procedures.
+
+## API Documentation
+
+For detailed API usage and endpoints, see the [API Documentation](API_DOC.md).
+
+## Contributing
+
+If you'd like to contribute to the development of the Patient Record Management System, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/your-feature`).
+3. Make your changes and commit (`git commit -am 'Add new feature'`).
+4. Push to the branch (`git push origin feature/your-feature`).
+5. Create a pull request explaining your changes.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+For any inquiries or issues, feel free to reach out:
+
+- **Email**: your.email@example.com
+- **GitHub**: [https://github.com/yourusername](https://github.com/yourusername)
+- **Project Repository**: [https://github.com/yourusername/PRMS](https://github.com/yourusername/PRMS)
